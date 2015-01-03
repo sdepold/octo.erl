@@ -1,4 +1,4 @@
-# octo.erl
+# octo.erl [![Build Status](https://travis-ci.org/sdepold/octo.erl.svg?branch=feature%2Flist-pull-requests)](https://travis-ci.org/sdepold/octo.erl)
 
 Erlang wrapper for the Github API.
 
