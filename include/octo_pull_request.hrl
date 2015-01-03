@@ -25,5 +25,15 @@
   locked,
   merge_commit_sha,
   assignee,
-  milestone
+  milestone,
+  merged,
+  mergeable,
+  mergeable_state,
+  merged_by,
+  comments,
+  review_comments,
+  commits,
+  additions,
+  deletions,
+  changed_files
 }).
