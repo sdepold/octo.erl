@@ -48,7 +48,7 @@ octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_re
 brew install rebar
 ```
 
-You can copmile the code and run the tests like this:
+You can compile the code and run the tests like this:
 
 ```
 git clone git@github.com:sdepold/octo.erl.git
