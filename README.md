@@ -2,17 +2,56 @@
 
 Erlang wrapper for the Github API.
 
-## Development notes
+## Installation
+
+You can install `octo.erl` via rebar. Just add it as dependency to your `rebar.config`:
+
+```erlang
+{deps, [
+  {octo, ".*", {git, "git://github.com/sdepold/octo.erl.git", {branch, "master"}}}
+]}.
+```
+
+Afterwards you can download and compile it:
 
 ```
-git clone git@github.com:sdepold/octo.erl.git
-cd octo.erl
-wget https://raw.github.com/wiki/rebar/rebar/rebar && chmod u+x rebar
-./rebar get-deps compile eunit
+rebar get-deps compile
 ```
 
 ## Usage
 
+### Records
+
+This lib ships a couple of record definitions which can be loaded via the `include_lib` directive:
+
 ```erlang
-octo:list_pull_requests(Username, ProjectName).
+-include_lib("octo/include/octo.hrl").
+```
+
+Or in the Erlang shell:
+
+```erlang
+rr("deps/octo/include/octo.hrl").
+```
+
+### API
+
+```erlang
+octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_request records
+```
+
+## Development notes
+
+`octo.erl` uses rebar as build tool. You can install it on OS X like this:
+
+```
+brew install rebar
+```
+
+You can copmile the code and run the tests like this:
+
+```
+git clone git@github.com:sdepold/octo.erl.git
+cd octo.erl
+rebar get-deps compile eunit
 ```
