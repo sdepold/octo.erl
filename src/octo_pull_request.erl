@@ -1,10 +1,9 @@
-%% octo_pulls: The handler for pull requests.
+%% octo_pull_request: The handler for pull requests.
 
--module(octo_pulls).
+-module(octo_pull_request).
 -include_lib("jsonerl/src/jsonerl.hrl").
 -include("octo.hrl").
 -export([list/2, read/3]).
-
 
 %% API
 

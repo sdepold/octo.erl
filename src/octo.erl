@@ -3,6 +3,7 @@
 %% octo: octo library's entry point.
 
 -export([list_pull_requests/2, read_pull_request/3]).
+
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -include("include/octo.hrl").
@@ -10,9 +11,10 @@
 
 %% API
 
-list_pull_requests (User, Repo) -> octo_pulls:list(User, Repo).
+list_pull_requests (User, Repo) ->
+  octo_pull_request:list(User, Repo).
 read_pull_request(User, Repo, Number) ->
-  octo_pulls:read(User, Repo, Number).
+  octo_pull_request:read(User, Repo, Number).
 
 %% Tests
 
