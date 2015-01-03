@@ -1,6 +1,21 @@
 # octo.erl [![Build Status](https://travis-ci.org/sdepold/octo.erl.svg?branch=feature%2Flist-pull-requests)](https://travis-ci.org/sdepold/octo.erl)
 
-Erlang wrapper for the Github API.
+The library `octo.erl` is a wrapper for the (public) Github API written in Erlang.
+It focuses on reading data. Write ability might be added later.
+
+## Implementation state
+
+- [ ] Activity
+- [ ] Gists
+- [ ] Git Data
+- [ ] Issues
+- [ ] Misc
+- [ ] Organizations
+- [x] Pull Requests
+- [ ] Repositories
+- [ ] Search
+- [ ] Users
+- [ ] Enterprise
 
 ## Installation
 
