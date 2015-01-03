@@ -1,14 +1,14 @@
-{application, octo,
- [
+{application, octo, [
   {description, "An Erlang octo library"},
   {vsn, "1"},
   {modules, [
-             octo
-            ]},
+    octo
+  ]},
   {registered, []},
   {applications, [
-                  kernel,
-                  stdlib
-                 ]},
+    kernel,
+    stdlib,
+    hackney
+  ]},
   {env, []}
  ]}.
