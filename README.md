@@ -82,7 +82,6 @@ You can find further information about this topic here: https://github.com/blog/
   - [ ] Fork a gist
   - [ ] List gist forks
   - [ ] Delete a gist
-  - [ ] Custom media types
 - [ ] Git Data
   - [ ] Blobs
     - [ ] Get a Blob
@@ -110,7 +109,6 @@ You can find further information about this topic here: https://github.com/blog/
   - [ ] Get a single issue
   - [ ] Create an issue
   - [ ] Edit an issue
-  - [ ] Custom media types
 - [ ] Misc
 - [ ] Organizations
   - [ ] List your organizations
@@ -118,7 +116,6 @@ You can find further information about this topic here: https://github.com/blog/
   - [ ] Get an organization
   - [ ] Edit an organization
 - [ ] Pull Requests
-  - [ ] Link Relations
   - [x] List pull requests
   - [x] Get a single pull request
   - [ ] Create a pull request
@@ -127,7 +124,6 @@ You can find further information about this topic here: https://github.com/blog/
   - [x] List pull requests files
   - [x] Get if a pull request has been merged
   - [ ] Merge a pull request (Merge Button)
-  - [ ] Custom media types
 - [ ] Repositories
   - [ ] List your repositories
   - [ ] List user repositories
