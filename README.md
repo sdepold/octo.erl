@@ -3,20 +3,6 @@
 The library `octo.erl` is a wrapper for the Github API written in Erlang.
 It focuses on reading data. Write ability might be added later.
 
-## Implementation state
-
-- [ ] Activity
-- [ ] Gists
-- [ ] Git Data
-- [ ] Issues
-- [ ] Misc
-- [ ] Organizations
-- [x] Pull Requests
-- [ ] Repositories
-- [ ] Search
-- [ ] Users
-- [ ] Enterprise
-
 ## Installation
 
 You can install `octo.erl` via rebar. Just add it as dependency to your `rebar.config`:
@@ -79,6 +65,95 @@ Options           = [{ auth, pat, "your_personal_api_token" }].
 ```
 
 You can find further information about this topic here: https://github.com/blog/1509-personal-api-tokens
+
+## Implementation state
+
+- [ ] Activity
+- [ ] Gists
+  - [ ] List gists
+  - [ ] Get a single gist
+  - [ ] Create a gist
+  - [ ] Edit a gist
+  - [ ] List gist commits
+  - [ ] Star a gist
+  - [ ] Unstar a gist
+  - [ ] Check if a gist is starred
+  - [ ] Fork a gist
+  - [ ] List gist forks
+  - [ ] Delete a gist
+  - [ ] Custom media types
+- [ ] Git Data
+  - [ ] Blobs
+    - [ ] Get a Blob
+    - [ ] Create a Blob
+    - [ ] Custom media types
+  - [ ] Commits
+    - [ ] Get a Commit
+    - [ ] Create a Commit
+  - [ ] References
+    - [ ] Get a Reference
+    - [ ] Get all References
+    - [ ] Create a Reference
+    - [ ] Update a Reference
+    - [ ] Delete a Reference
+  - [ ] Tags
+    - [ ] Get a Tag
+    - [ ] Create a Tag Object
+  - [ ] Trees
+    - [ ] Get a Tree
+    - [ ] Get a Tree Recursively
+    - [ ] Create a Tree
+- [ ] Issues
+  - [ ] List issues
+  - [ ] List issues for a repository
+  - [ ] Get a single issue
+  - [ ] Create an issue
+  - [ ] Edit an issue
+  - [ ] Custom media types
+- [ ] Misc
+- [ ] Organizations
+  - [ ] List your organizations
+  - [ ] List user organizations
+  - [ ] Get an organization
+  - [ ] Edit an organization
+- [ ] Pull Requests
+  - [ ] Link Relations
+  - [x] List pull requests
+  - [x] Get a single pull request
+  - [ ] Create a pull request
+  - [ ] Update a pull request
+  - [x] List commits on a pull request
+  - [x] List pull requests files
+  - [ ] Get if a pull request has been merged
+  - [ ] Merge a pull request (Merge Button)
+  - [ ] Custom media types
+- [ ] Repositories
+  - [ ] List your repositories
+  - [ ] List user repositories
+  - [ ] List organization repositories
+  - [ ] List all public repositories
+  - [ ] Create
+  - [ ] Get
+  - [ ] Edit
+  - [ ] List contributors
+  - [ ] List languages
+  - [ ] List Teams
+  - [ ] List Tags
+  - [ ] List Branches
+  - [ ] Get Branch
+  - [ ] Delete a Repository
+- [ ] Search
+  - [ ] Search repositories
+  - [ ] Search code
+  - [ ] Search issues
+  - [ ] Search users
+  - [ ] Text match metadata
+- [ ] Users
+  - [ ] Get a single user
+  - [ ] Get the authenticated user
+  - [ ] Update the authenticated user
+  - [ ] Get all users
+- [ ] Enterprise
 
 ## Development notes
 
