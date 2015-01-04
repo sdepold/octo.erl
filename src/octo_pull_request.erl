@@ -1,27 +1,24 @@
 %% octo_pull_request: The handler for pull requests.
 
 -module(octo_pull_request).
--include_lib("jsonerl/src/jsonerl.hrl").
 -include("octo.hrl").
--export([list/2, read/3]).
+-export([list/3, read/4, list_commits/4]).
 
 %% API
 
-list(Owner, Repo) ->
-  Url          = "https://api.github.com/repos/" ++ Owner ++ "/" ++ Repo ++ "/pulls",
-  Json         = octo_helper:get(Url),
+list(Owner, Repo, Options) ->
+  Url          = octo_helper:get_pull_request_url(Owner, Repo),
+  Json         = octo_helper:get(Url, Options),
   PullRequests = jsonerl:decode(Json),
-  pull_request_blobs_to_record_list(PullRequests).
+  [ ?struct_to_record(octo_pull_request, PullRequest) || (PullRequest) <- PullRequests ].
 
-read(Owner, Repo, Number) ->
-  Url  = "https://api.github.com/repos/" ++ Owner ++ "/" ++ Repo ++ "/pulls/" ++ integer_to_list(Number),
-  Json = octo_helper:get(Url),
+read(Owner, Repo, Number, Options) ->
+  Url  = octo_helper:get_pull_request_url(Owner, Repo, Number),
+  Json = octo_helper:get(Url, Options),
   ?json_to_record(octo_pull_request, Json).
 
-pull_request_blobs_to_record_list(PullRequests) ->
-  lists:map(
-    fun(PullRequest) ->
-      ?struct_to_record(octo_pull_request, PullRequest)
-    end,
-    PullRequests
-  ).
+list_commits(Owner, Repo, Number, Options) ->
+  Url     = octo_helper:get_pull_request_commits_url(Owner, Repo, Number),
+  Json    = octo_helper:get(Url, Options),
+  Commits = jsonerl:decode(Json),
+  [ ?struct_to_record(octo_commit, Commit) || (Commit) <- Commits ].
