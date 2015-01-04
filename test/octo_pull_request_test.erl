@@ -24,6 +24,16 @@ list_pull_request_files_test() ->
   {ok, [File]} = octo:list_pull_request_files("sdepold", "octo.erl", 1, request_options()),
   assert_file(File).
 
+is_pull_request_merged_test() ->
+  ?assertEqual(
+    octo:is_pull_request_merged("sdepold", "octo.erl", 1, request_options()),
+    {ok, false}
+  ),
+  ?assertEqual(
+    octo:is_pull_request_merged("sdepold", "octo.erl", 2, request_options()),
+    {ok, true}
+  ).
+
 %% The test helpers
 
 find_test_pull_request_in_list([]) -> null;
@@ -38,7 +48,7 @@ assert_pull_request(PullRequest) ->
   ?assertEqual(PullRequest#octo_pull_request.state,      <<"open">>),
   ?assertEqual(PullRequest#octo_pull_request.body,       <<"This is a test pull request.">>),
   ?assertEqual(PullRequest#octo_pull_request.created_at, <<"2014-12-30T20:02:37Z">>),
-  ?assertEqual(PullRequest#octo_pull_request.updated_at, <<"2015-01-03T13:01:19Z">>).
+  ?assertEqual(PullRequest#octo_pull_request.updated_at, <<"2015-01-04T12:05:19Z">>).
 
 assert_commit(Commit) ->
   ?assertEqual(Commit#octo_commit.html_url, <<"https://github.com/sdepold/octo.erl/commit/b87ca4769260b778c6f4b6e5dadab546f5c89adc">>),
