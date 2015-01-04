@@ -51,6 +51,14 @@ rr("deps/octo/include/octo.hrl").
 
 ### API
 
+Every of the following commands returns a tuple à la:
+
+```erlang
+{ok, Result}
+```
+
+This are the available functions:
+
 ```erlang
 octo:read_pull_request(Username, ProjectName, Number). % Returns a octo_pull_request records.
 octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_request records.
@@ -66,8 +74,8 @@ a list. Supported are the following authentication strategies:
 #### Personal API tokens
 
 ```erlang
-Options = [{ auth, pat, "your_personal_api_token" }].
-PullRequest = octo:read_pull_request(Username, ProjectName, Number, Options).
+Options           = [{ auth, pat, "your_personal_api_token" }].
+{ok, PullRequest} = octo:read_pull_request(Username, ProjectName, Number, Options).
 ```
 
 You can find further information about this topic here: https://github.com/blog/1509-personal-api-tokens

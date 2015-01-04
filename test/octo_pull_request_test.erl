@@ -8,20 +8,20 @@
 %% The tests
 
 list_pull_requests_test() ->
-  PullRequests = octo:list_pull_requests("sdepold", "octo.erl", request_options()),
-  PullRequest  = find_test_pull_request_in_list(PullRequests),
+  {ok, PullRequests} = octo:list_pull_requests("sdepold", "octo.erl", request_options()),
+  PullRequest = find_test_pull_request_in_list(PullRequests),
   assert_pull_request(PullRequest).
 
 read_pull_request_test() ->
-  PullRequest = octo:read_pull_request("sdepold", "octo.erl", 1, request_options()),
+  {ok, PullRequest} = octo:read_pull_request("sdepold", "octo.erl", 1, request_options()),
   assert_pull_request(PullRequest).
 
 list_pull_request_commits_test() ->
-  [Commit] = octo:list_pull_request_commits("sdepold", "octo.erl", 1, request_options()),
+  {ok, [Commit]} = octo:list_pull_request_commits("sdepold", "octo.erl", 1, request_options()),
   assert_commit(Commit).
 
 list_pull_request_files_test() ->
-  [File] = octo:list_pull_request_files("sdepold", "octo.erl", 1, request_options()),
+  {ok, [File]} = octo:list_pull_request_files("sdepold", "octo.erl", 1, request_options()),
   assert_file(File).
 
 %% The test helpers
@@ -57,5 +57,5 @@ request_options() ->
   AuthToken = os:getenv("AUTH_TOKEN"),
   case AuthToken of
     false -> [];
-    _     -> [{ auth, pat, AuthToken }]
+    _     -> [{auth, pat, AuthToken}]
   end.
