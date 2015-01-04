@@ -1,6 +1,21 @@
 # octo.erl [![Build Status](https://travis-ci.org/sdepold/octo.erl.svg?branch=feature%2Flist-pull-requests)](https://travis-ci.org/sdepold/octo.erl)
 
-Erlang wrapper for the Github API.
+The library `octo.erl` is a wrapper for the Github API written in Erlang.
+It focuses on reading data. Write ability might be added later.
+
+## Implementation state
+
+- [ ] Activity
+- [ ] Gists
+- [ ] Git Data
+- [ ] Issues
+- [ ] Misc
+- [ ] Organizations
+- [x] Pull Requests
+- [ ] Repositories
+- [ ] Search
+- [ ] Users
+- [ ] Enterprise
 
 ## Installation
 
@@ -37,9 +52,24 @@ rr("deps/octo/include/octo.hrl").
 ### API
 
 ```erlang
-octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_request records
-octo:read_pull_request(Username, ProjectName, Number). % Returns a octo_pull_request records
+octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_request records.
+octo:read_pull_request(Username, ProjectName, Number). % Returns a octo_pull_request records.
+octo:list_pull_request_commits(Username, ProjectName, Number). % Returns a list of octo_commit records.
 ```
+
+### Authentication
+
+Every of the mentioned functions can be called with an additional options parameter. It has to be
+a list. Supported are the following authentication strategies:
+
+#### Personal API tokens
+
+```erlang
+Options = [{ auth, pat, "your_personal_api_token" }].
+PullRequest = octo:read_pull_request(Username, ProjectName, Number, Options).
+```
+
+You can find further information about this topic here: https://github.com/blog/1509-personal-api-tokens
 
 ## Development notes
 
@@ -54,5 +84,14 @@ You can compile the code and run the tests like this:
 ```
 git clone git@github.com:sdepold/octo.erl.git
 cd octo.erl
-rebar get-deps compile eunit
+rebar get-deps compile
+```
+
+### Running the tests
+
+When running the tests you might run into rate limits. You can improve the situation via providing
+an authentication token (PAT) like this:
+
+```
+AUTH_TOKEN="YOUR_TOKEN" rebar eunit
 ```
