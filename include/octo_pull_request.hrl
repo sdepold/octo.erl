@@ -35,5 +35,6 @@
   commits,
   additions,
   deletions,
-  changed_files
+  changed_files,
+  documentation_url
 }).
