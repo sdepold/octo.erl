@@ -52,9 +52,10 @@ rr("deps/octo/include/octo.hrl").
 ### API
 
 ```erlang
-octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_request records.
 octo:read_pull_request(Username, ProjectName, Number). % Returns a octo_pull_request records.
+octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_request records.
 octo:list_pull_request_commits(Username, ProjectName, Number). % Returns a list of octo_commit records.
+octo:list_pull_request_files(Username, ProjectName, Number). % Returns a list of octo_file records.
 ```
 
 ### Authentication

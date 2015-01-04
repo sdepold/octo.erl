@@ -20,6 +20,10 @@ list_pull_request_commits_test() ->
   [Commit] = octo:list_pull_request_commits("sdepold", "octo.erl", 1, request_options()),
   assert_commit(Commit).
 
+list_pull_request_files_test() ->
+  [File] = octo:list_pull_request_files("sdepold", "octo.erl", 1, request_options()),
+  assert_file(File).
+
 %% The test helpers
 
 find_test_pull_request_in_list([]) -> null;
@@ -38,7 +42,16 @@ assert_pull_request(PullRequest) ->
 
 assert_commit(Commit) ->
   ?assertEqual(Commit#octo_commit.html_url, <<"https://github.com/sdepold/octo.erl/commit/b87ca4769260b778c6f4b6e5dadab546f5c89adc">>),
-  ?assertEqual(Commit#octo_commit.sha, <<"b87ca4769260b778c6f4b6e5dadab546f5c89adc">>).
+  ?assertEqual(Commit#octo_commit.sha,      <<"b87ca4769260b778c6f4b6e5dadab546f5c89adc">>).
+
+assert_file(File) ->
+  ?assertEqual(File#octo_file.sha,       <<"345e6aef713208c8d50cdea23b85e6ad831f0449">>),
+  ?assertEqual(File#octo_file.filename,  <<"README.md">>),
+  ?assertEqual(File#octo_file.status,    <<"modified">>),
+  ?assertEqual(File#octo_file.additions, 1),
+  ?assertEqual(File#octo_file.deletions, 12),
+  ?assertEqual(File#octo_file.changes,   13),
+  ?assertEqual(File#octo_file.blob_url,  <<"https://github.com/sdepold/octo.erl/blob/b87ca4769260b778c6f4b6e5dadab546f5c89adc/README.md">>).
 
 request_options() ->
   AuthToken = os:getenv("AUTH_TOKEN"),

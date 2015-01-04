@@ -3,9 +3,10 @@
 %% octo: octo library's entry point.
 
 -export([
-  list_pull_requests/2, list_pull_requests/3, read_pull_request/3, read_pull_request/4,
-  list_pull_request_commits/3, list_pull_request_commits/4
-
+  list_pull_requests/2, list_pull_requests/3,
+  read_pull_request/3, read_pull_request/4,
+  list_pull_request_commits/3, list_pull_request_commits/4,
+  list_pull_request_files/3, list_pull_request_files/4
 ]).
 
 %% API
@@ -24,6 +25,11 @@ list_pull_request_commits(User, Repo, Number) ->
   list_pull_request_commits(User, Repo, Number, []).
 list_pull_request_commits(User, Repo, Number, Options) ->
   exec(octo_pull_request, list_commits, [User, Repo, Number, Options]).
+
+list_pull_request_files(User, Repo, Number) ->
+  list_pull_request_files(User, Repo, Number, []).
+list_pull_request_files(User, Repo, Number, Options) ->
+  exec(octo_pull_request, list_files, [User, Repo, Number, Options]).
 
 %% Internals
 
