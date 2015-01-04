@@ -1,1 +1,2 @@
 -include("octo_pull_request.hrl").
+-include("octo_commit.hrl").
