@@ -7,8 +7,7 @@
   {registered, []},
   {applications, [
     kernel,
-    stdlib,
-    hackney
+    stdlib
   ]},
   {env, []}
  ]}.
