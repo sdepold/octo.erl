@@ -1,18 +1,20 @@
 -module(octo_http_helper).
 -export([
-  get/1, get/2, read_collection/3, get_response_status_code/2
+  get/2, post/3, read_collection/3, get_response_status_code/2
 ]).
 
-%% Generic GET request function
-get(Url) -> get(Url, []).
-
 get(Url, Headers) ->
-  {ok, _StatusCode, _RespHeaders, ClientRef} = do_get_request(Url, Headers),
+  {ok, _StatusCode, _RespHeaders, ClientRef} = do_request(get, Url, Headers),
+  {ok, Body} = hackney:body(ClientRef),
+  Body.
+
+post(Url, Headers, Payload) ->
+  {ok, _StatusCode, _RespHeaders, ClientRef} = do_request(post, Url, Headers, Payload),
   {ok, Body} = hackney:body(ClientRef),
   Body.
 
 get_response_status_code(Url, Headers) ->
-  {ok, StatusCode, _RespHeaders, _ClientRef} = do_get_request(Url, Headers),
+  {ok, StatusCode, _RespHeaders, _ClientRef} = do_request(get, Url, Headers),
   StatusCode.
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
@@ -24,9 +26,13 @@ read_collection(Thing, Args, Options) ->
 
 %% Internals
 
-do_get_request(Url, Headers) ->
+do_request(Method, Url, Headers) ->
+  do_request(Method, Url, Headers, <<>>, []).
+
+do_request(Method, Url, Headers, Payload) ->
+  do_request(Method, Url, Headers, Payload, []).
+
+do_request(Method, Url, Headers, Payload, Options) ->
   hackney:start(),
-  Headers2 = octo_auth_helper:parse_options(Headers),
-  Payload  = <<>>,
-  Options  = [],
-  hackney:request(get, Url, Headers2, Payload, Options).
+  ParsedHeaders = octo_auth_helper:parse_options(Headers),
+  hackney:request(Method, Url, ParsedHeaders, Payload, Options).
