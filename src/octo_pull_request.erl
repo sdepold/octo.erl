@@ -2,7 +2,9 @@
 
 -module(octo_pull_request).
 -include("octo.hrl").
--export([list/3, read/4, list_commits/4, list_files/4, is_merged/4]).
+-export([
+  list/3, read/4, list_commits/4, list_files/4, is_merged/4, create/4
+]).
 
 %% API
 
@@ -36,3 +38,9 @@ is_merged(Owner, Repo, Number, Options) ->
     204 -> true
   end,
   {ok, Result}.
+
+create(Owner, Repo, Payload, Options) ->
+  Url         = octo_url_helper:pull_request_url(Owner, Repo),
+  PayloadJson = jsonerl:encode(Payload),
+  Result      = octo_http_helper:post(Url, Options, PayloadJson),
+  {ok, ?json_to_record(octo_pull_request, Result)}.

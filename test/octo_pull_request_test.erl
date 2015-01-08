@@ -34,6 +34,16 @@ is_pull_request_merged_test() ->
     {ok, true}
   ).
 
+create_pull_request_test() ->
+  {ok, PullRequest} = octo:create_pull_request("sdepold", "octo.erl-test", {
+    {<<"title">>, <<"Amazing new feature">>},
+    {<<"body">>, <<"Please pull this in!">>},
+    {<<"head">>, <<"test/head">>},
+    {<<"base">>, <<"test/base">>}
+  }, request_options()),
+  ?assertEqual(PullRequest#octo_pull_request.title, <<"Amazing new feature">>),
+  ?assertEqual(PullRequest#octo_pull_request.body, <<"Please pull this in!">>).
+
 %% The test helpers
 
 find_test_pull_request_in_list([]) -> null;
