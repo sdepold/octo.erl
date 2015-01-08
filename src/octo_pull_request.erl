@@ -1,5 +1,3 @@
-%% octo_pull_request: The handler for pull requests.
-
 -module(octo_pull_request).
 -include("octo.hrl").
 -export([
