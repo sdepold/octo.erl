@@ -51,6 +51,12 @@ octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_re
 octo:list_pull_request_commits(Username, ProjectName, Number). % Returns a list of octo_commit records.
 octo:list_pull_request_files(Username, ProjectName, Number). % Returns a list of octo_file records.
 octo:is_pull_request_merged(Username, ProjectName, Number). % Returns a whether or not a pull request is merged.
+octo:create_pull_request(Username, ProjectName, {
+  {<<"title">>, <<"Pull request title">>},
+  {<<"body">>, <<"Pull request description">>},
+  {<<"head">>, <<"Head branch">>},
+  {<<"base">>, <<"Base branch">>}
+}). % Returns the just created pull request.
 ```
 
 ### Authentication
@@ -118,7 +124,7 @@ You can find further information about this topic here: https://github.com/blog/
 - [ ] Pull Requests
   - [x] List pull requests
   - [x] Get a single pull request
-  - [ ] Create a pull request
+  - [x] Create a pull request
   - [ ] Update a pull request
   - [x] List commits on a pull request
   - [x] List pull requests files
