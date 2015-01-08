@@ -35,14 +35,28 @@ is_pull_request_merged_test() ->
   ).
 
 create_pull_request_test() ->
-  {ok, PullRequest} = octo:create_pull_request("sdepold", "octo.erl-test", {
-    {<<"title">>, <<"Amazing new feature">>},
-    {<<"body">>, <<"Please pull this in!">>},
-    {<<"head">>, <<"test/head">>},
-    {<<"base">>, <<"test/base">>}
-  }, request_options()),
+  {ok, PullRequest}        = create_test_pull_request(),
+  {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
   ?assertEqual(PullRequest#octo_pull_request.title, <<"Amazing new feature">>),
   ?assertEqual(PullRequest#octo_pull_request.body, <<"Please pull this in!">>).
+
+update_pull_request_state_test() ->
+  {ok, PullRequest}        = create_test_pull_request(),
+  {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
+  {ok, AllPullRequests}    = octo:list_pull_requests("sdepold", "octo.erl-test", request_options()),
+  ?assertEqual(AllPullRequests, []).
+
+update_pull_request_title_test() ->
+  {ok, PullRequest}        = create_test_pull_request(),
+  {ok, UpdatedPullRequest} = update_pull_request(PullRequest, {{<<"title">>, <<"Something else">>}}),
+  {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
+  ?assertEqual(UpdatedPullRequest#octo_pull_request.title, <<"Something else">>).
+
+update_pull_request_body_test() ->
+  {ok, PullRequest}        = create_test_pull_request(),
+  {ok, UpdatedPullRequest} = update_pull_request(PullRequest, {{<<"body">>, <<"Noot">>}}),
+  {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
+  ?assertEqual(UpdatedPullRequest#octo_pull_request.body, <<"Noot">>).
 
 %% The test helpers
 
@@ -58,7 +72,7 @@ assert_pull_request(PullRequest) ->
   ?assertEqual(PullRequest#octo_pull_request.state,      <<"open">>),
   ?assertEqual(PullRequest#octo_pull_request.body,       <<"This is a test pull request.">>),
   ?assertEqual(PullRequest#octo_pull_request.created_at, <<"2014-12-30T20:02:37Z">>),
-  ?assertEqual(PullRequest#octo_pull_request.updated_at, <<"2015-01-04T12:05:19Z">>).
+  ?assertEqual(PullRequest#octo_pull_request.updated_at, <<"2015-01-08T11:59:08Z">>).
 
 assert_commit(Commit) ->
   ?assertEqual(Commit#octo_commit.html_url, <<"https://github.com/sdepold/octo.erl/commit/b87ca4769260b778c6f4b6e5dadab546f5c89adc">>),
@@ -79,3 +93,19 @@ request_options() ->
     false -> [];
     _     -> [{auth, pat, AuthToken}]
   end.
+
+update_pull_request(PullRequest, Payload) ->
+  octo:update_pull_request(
+    "sdepold", "octo.erl-test", PullRequest#octo_pull_request.number, Payload, request_options()
+  ).
+
+close_pull_request(PullRequest) ->
+  update_pull_request(PullRequest, {{<<"state">>, <<"closed">>}}).
+
+create_test_pull_request() ->
+  octo:create_pull_request("sdepold", "octo.erl-test", {
+    {<<"title">>, <<"Amazing new feature">>},
+    {<<"body">>, <<"Please pull this in!">>},
+    {<<"head">>, <<"test/head">>},
+    {<<"base">>, <<"test/base">>}
+  }, request_options()).

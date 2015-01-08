@@ -3,7 +3,7 @@
 -module(octo_pull_request).
 -include("octo.hrl").
 -export([
-  list/3, read/4, list_commits/4, list_files/4, is_merged/4, create/4
+  list/3, read/4, list_commits/4, list_files/4, is_merged/4, create/4, update/5
 ]).
 
 %% API
@@ -18,7 +18,6 @@ read(Owner, Repo, Number, Options) ->
   Json   = octo_http_helper:get(Url, Options),
   Result = ?json_to_record(octo_pull_request, Json),
   {ok, Result}.
-
 
 list_commits(Owner, Repo, Number, Options) ->
   Commits = octo_http_helper:read_collection(pull_request_commits, [Owner, Repo, Number], Options),
@@ -43,4 +42,10 @@ create(Owner, Repo, Payload, Options) ->
   Url         = octo_url_helper:pull_request_url(Owner, Repo),
   PayloadJson = jsonerl:encode(Payload),
   Result      = octo_http_helper:post(Url, Options, PayloadJson),
+  {ok, ?json_to_record(octo_pull_request, Result)}.
+
+update(Owner, Repo, Number, Payload, Options) ->
+  Url         = octo_url_helper:pull_request_url(Owner, Repo, Number),
+  PayloadJson = jsonerl:encode(Payload),
+  Result      = octo_http_helper:patch(Url, Options, PayloadJson),
   {ok, ?json_to_record(octo_pull_request, Result)}.
