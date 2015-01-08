@@ -8,7 +8,8 @@
   list_pull_request_commits/3, list_pull_request_commits/4,
   list_pull_request_files/3, list_pull_request_files/4,
   is_pull_request_merged/3, is_pull_request_merged/4,
-  create_pull_request/3, create_pull_request/4
+  create_pull_request/3, create_pull_request/4,
+  update_pull_request/4, update_pull_request/5
 ]).
 
 %% API
@@ -38,16 +39,19 @@ is_pull_request_merged(User, Repo, Number) ->
 is_pull_request_merged(User, Repo, Number, Options) ->
   exec(octo_pull_request, is_merged, [User, Repo, Number, Options]).
 
-  create_pull_request(User, Repo, Payload) ->
-    create_pull_request(User, Repo, Payload, []).
-  create_pull_request(User, Repo, Payload, Options) ->
-    exec(octo_pull_request, create, [User, Repo, Payload, Options]).
+create_pull_request(User, Repo, Payload) ->
+  create_pull_request(User, Repo, Payload, []).
+create_pull_request(User, Repo, Payload, Options) ->
+  exec(octo_pull_request, create, [User, Repo, Payload, Options]).
+
+update_pull_request(User, Repo, Number, Payload) ->
+  update_pull_request(User, Repo, Number, Payload, []).
+update_pull_request(User, Repo, Number, Payload, Options) ->
+  exec(octo_pull_request, update, [User, Repo, Number, Payload, Options]).
 
 %% Internals
 
 exec(Mod, Fun, Args) ->
-  Result = erlang:apply(Mod, Fun, Args),
-  % hackney:stop(),
-  Result.
+  erlang:apply(Mod, Fun, Args).
 
 %% End of Module.

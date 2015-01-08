@@ -57,6 +57,12 @@ octo:create_pull_request(Username, ProjectName, {
   {<<"head">>, <<"Head branch">>},
   {<<"base">>, <<"Base branch">>}
 }). % Returns the just created pull request.
+octo:update_pull_request(Username, ProjectName, Number, {
+  % The following options are possible:
+  {<<"state">>, <<"closed">>},
+  {<<"title">>, <<"Another title">>},
+  {<<"body">>, <<"Another body">>}
+}). % Returns the updated pull request.
 ```
 
 ### Authentication
@@ -125,7 +131,7 @@ You can find further information about this topic here: https://github.com/blog/
   - [x] List pull requests
   - [x] Get a single pull request
   - [x] Create a pull request
-  - [ ] Update a pull request
+  - [x] Update a pull request
   - [x] List commits on a pull request
   - [x] List pull requests files
   - [x] Get if a pull request has been merged

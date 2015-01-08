@@ -1,6 +1,6 @@
 -module(octo_http_helper).
 -export([
-  get/2, post/3, read_collection/3, get_response_status_code/2
+  get/2, post/3, patch/3, read_collection/3, get_response_status_code/2
 ]).
 
 get(Url, Headers) ->
@@ -10,6 +10,11 @@ get(Url, Headers) ->
 
 post(Url, Headers, Payload) ->
   {ok, _StatusCode, _RespHeaders, ClientRef} = do_request(post, Url, Headers, Payload),
+  {ok, Body} = hackney:body(ClientRef),
+  Body.
+
+patch(Url, Headers, Payload) ->
+  {ok, _StatusCode, _RespHeaders, ClientRef} = do_request(patch, Url, Headers, Payload),
   {ok, Body} = hackney:body(ClientRef),
   Body.
 
