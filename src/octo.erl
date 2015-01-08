@@ -12,6 +12,11 @@
   update_pull_request/4, update_pull_request/5
 ]).
 
+-export([
+  list_branches/2, list_branches/3,
+  list_tags/2, list_tags/3
+]).
+
 %% API
 
 list_pull_requests(User, Repo) ->
@@ -48,6 +53,16 @@ update_pull_request(User, Repo, Number, Payload) ->
   update_pull_request(User, Repo, Number, Payload, []).
 update_pull_request(User, Repo, Number, Payload, Options) ->
   exec(octo_pull_request, update, [User, Repo, Number, Payload, Options]).
+
+list_branches(User, Repo) ->
+  list_branches(User, Repo, []).
+list_branches(User, Repo, Options) ->
+  exec(octo_reference, list_branches, [User, Repo, Options]).
+
+list_tags(User, Repo) ->
+  list_tags(User, Repo, []).
+list_tags(User, Repo, Options) ->
+  exec(octo_reference, list_tags, [User, Repo, Options]).
 
 %% Internals
 

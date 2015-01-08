@@ -43,7 +43,9 @@ Every of the following commands returns a tuple à la:
 {ok, Result}
 ```
 
-This are the available functions:
+The following paragraphs are describing the existing functions.
+
+#### Pull Request
 
 ```erlang
 octo:read_pull_request(Username, ProjectName, Number). % Returns a octo_pull_request records.
@@ -63,6 +65,13 @@ octo:update_pull_request(Username, ProjectName, Number, {
   {<<"title">>, <<"Another title">>},
   {<<"body">>, <<"Another body">>}
 }). % Returns the updated pull request.
+```
+
+#### References
+
+```erlang
+octo:list_branches(Username, ProjectName). % Returns a list of branch octo_references.
+octo:list_tags(Username, ProjectName). % Returns a list of tag octo_references.
 ```
 
 ### Authentication
@@ -104,7 +113,7 @@ You can find further information about this topic here: https://github.com/blog/
     - [ ] Create a Commit
   - [ ] References
     - [ ] Get a Reference
-    - [ ] Get all References
+    - [x] Get all References
     - [ ] Create a Reference
     - [ ] Update a Reference
     - [ ] Delete a Reference
