@@ -1,10 +1,17 @@
 -module(octo_reference).
 -include("octo.hrl").
 -export([
-  list_branches/3, list_tags/3
+  list/3, list_branches/3, list_tags/3
 ]).
 
 %% API
+
+list(Owner, Repo, Options) ->
+  Url        = octo_url_helper:reference_url(Owner, Repo),
+  Json       = octo_http_helper:get(Url, Options),
+  References = jsonerl:decode(Json),
+  Result     = [ ?struct_to_record(octo_reference, Reference) || (Reference) <- References ],
+  {ok, Result}.
 
 list_branches(Owner, Repo, Options) ->
   list_references(branch, Owner, Repo, Options).
