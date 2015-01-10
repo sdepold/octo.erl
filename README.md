@@ -35,6 +35,22 @@ Or in the Erlang shell:
 rr("deps/octo/include/octo.hrl").
 ```
 
+#### octo_pull_request
+
+To do: Explain octo_pull_request.
+
+#### octo_commit
+
+To do: Explain octo_commit.
+
+#### octo_file
+
+To do: Explain octo_file.
+
+#### octo_reference
+
+To do: Explain octo_reference.
+
 ### API
 
 Every of the following commands returns a tuple à la:
@@ -70,6 +86,7 @@ octo:update_pull_request(Username, ProjectName, Number, {
 #### References
 
 ```erlang
+octo:list_references(Username, ProjectName). % Returns a list of octo_references.
 octo:list_branches(Username, ProjectName). % Returns a list of branch octo_references.
 octo:list_tags(Username, ProjectName). % Returns a list of tag octo_references.
 ```

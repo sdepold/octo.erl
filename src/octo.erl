@@ -13,6 +13,7 @@
 ]).
 
 -export([
+  list_references/2, list_references/3,
   list_branches/2, list_branches/3,
   list_tags/2, list_tags/3
 ]).
@@ -53,6 +54,11 @@ update_pull_request(User, Repo, Number, Payload) ->
   update_pull_request(User, Repo, Number, Payload, []).
 update_pull_request(User, Repo, Number, Payload, Options) ->
   exec(octo_pull_request, update, [User, Repo, Number, Payload, Options]).
+
+list_references(User, Repo) ->
+  list_references(User, Repo, []).
+list_references(User, Repo, Options) ->
+  exec(octo_reference, list, [User, Repo, Options]).
 
 list_branches(User, Repo) ->
   list_branches(User, Repo, []).
