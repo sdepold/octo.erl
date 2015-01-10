@@ -6,7 +6,8 @@
 %% The tests
 
 list_test() ->
-  {ok, References} = octo:list_references("sdepold", "octo.erl-test", request_options()),
+  Options          = [{ all_pages }, { per_page, 100 }] ++ request_options(),
+  {ok, References} = octo:list_references("sdepold", "octo.erl-test", Options),
   RefNames         = [ Reference#octo_reference.ref || Reference <- References ],
   assertContainsBranches(RefNames),
   assertContainsTags(RefNames),
@@ -33,9 +34,7 @@ assertContainsBranches(RefNames) ->
   ?assert(string:str(RefNames, [<<"refs/heads/test/base">>]) > 0).
 
 assertContainsTags(RefNames) ->
-  % Todo: Make the following line pass:
-  % ?assert(string:str(RefNames, [<<"refs/tags/test">>]) > 0).
-  ?debugVal("Test for tags is missing").
+  ?assert(string:str(RefNames, [<<"refs/tags/test">>]) > 0).
 
 assertContainsMisc(RefNames) ->
   ?assert(string:str(RefNames, [<<"refs/pull/1/merge">>]) > 0),
