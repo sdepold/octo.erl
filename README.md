@@ -91,19 +91,40 @@ octo:list_branches(Username, ProjectName). % Returns a list of branch octo_refer
 octo:list_tags(Username, ProjectName). % Returns a list of tag octo_references.
 ```
 
-### Authentication
+### Options
 
 Every of the mentioned functions can be called with an additional options parameter. It has to be
-a list. Supported are the following authentication strategies:
+a list. The following options are available:
 
-#### Personal API tokens
+#### Authentication
+
+Currently it is only possible to authenticate via a *Personal Api token*. You can find further
+information about this topic here: https://github.com/blog/1509-personal-api-tokens
 
 ```erlang
 Options           = [{ auth, pat, "your_personal_api_token" }].
 {ok, PullRequest} = octo:read_pull_request(Username, ProjectName, Number, Options).
 ```
 
-You can find further information about this topic here: https://github.com/blog/1509-personal-api-tokens
+#### Pagination
+
+Every function that returns a list is paginated. By default that are a 30 entries per page.
+You can configure the pagination like this:
+
+```erlang
+Options            = [{ page, 1 }, { per_page, 100 }].
+{ok, PullRequests} = octo:read_pull_request(Username, ProjectName, Number, Options).
+```
+
+#### Reading all entries
+
+If you don't want to do the pagination manually, you can also provide an option that resolves all
+pages automatically:
+
+```erlang
+Options            = [{ all_pages }].
+{ok, PullRequests} = octo:read_pull_request(Username, ProjectName, Number, Options).
+```
 
 ## Implementation state
 

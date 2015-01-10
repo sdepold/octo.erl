@@ -11,5 +11,5 @@ parse_options([{ auth, pat, Pat } | Rest]) ->
   Header = {"Authorization", "Basic " ++ base64:encode_to_string(Pat ++ ":x-oauth-basic")},
   [Header | Rest];
 
-parse_options([Element|Rest]) ->
-  [Element | parse_options(Rest)].
+parse_options([_|Rest]) ->
+  parse_options(Rest).

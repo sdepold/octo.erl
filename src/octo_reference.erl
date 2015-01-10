@@ -7,9 +7,7 @@
 %% API
 
 list(Owner, Repo, Options) ->
-  Url        = octo_url_helper:reference_url(Owner, Repo),
-  Json       = octo_http_helper:get(Url, Options),
-  References = jsonerl:decode(Json),
+  References = octo_http_helper:read_collection(reference, [Owner, Repo], Options),
   Result     = [ ?struct_to_record(octo_reference, Reference) || (Reference) <- References ],
   {ok, Result}.
 
