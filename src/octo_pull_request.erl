@@ -12,9 +12,9 @@ list(Owner, Repo, Options) ->
   {ok, Result}.
 
 read(Owner, Repo, Number, Options) ->
-  Url    = octo_url_helper:pull_request_url(Owner, Repo, Number),
-  Json   = octo_http_helper:get(Url, Options),
-  Result = ?json_to_record(octo_pull_request, Json),
+  Url        = octo_url_helper:pull_request_url(Owner, Repo, Number),
+  {ok, Json} = octo_http_helper:get(Url, Options),
+  Result     = ?json_to_record(octo_pull_request, Json),
   {ok, Result}.
 
 list_commits(Owner, Repo, Number, Options) ->
@@ -37,13 +37,13 @@ is_merged(Owner, Repo, Number, Options) ->
   {ok, Result}.
 
 create(Owner, Repo, Payload, Options) ->
-  Url         = octo_url_helper:pull_request_url(Owner, Repo),
-  PayloadJson = jsonerl:encode(Payload),
-  Result      = octo_http_helper:post(Url, Options, PayloadJson),
+  Url          = octo_url_helper:pull_request_url(Owner, Repo),
+  PayloadJson  = jsonerl:encode(Payload),
+  {ok, Result} = octo_http_helper:post(Url, Options, PayloadJson),
   {ok, ?json_to_record(octo_pull_request, Result)}.
 
 update(Owner, Repo, Number, Payload, Options) ->
-  Url         = octo_url_helper:pull_request_url(Owner, Repo, Number),
-  PayloadJson = jsonerl:encode(Payload),
-  Result      = octo_http_helper:patch(Url, Options, PayloadJson),
+  Url          = octo_url_helper:pull_request_url(Owner, Repo, Number),
+  PayloadJson  = jsonerl:encode(Payload),
+  {ok, Result} = octo_http_helper:patch(Url, Options, PayloadJson),
   {ok, ?json_to_record(octo_pull_request, Result)}.
