@@ -20,55 +20,40 @@
 
 %% API
 
-list_pull_requests(User, Repo) ->
-  list_pull_requests(User, Repo, []).
-list_pull_requests(User, Repo, Options) ->
-  exec(octo_pull_request, list, [User, Repo, Options]).
+%%% Pull Requests
 
-read_pull_request(User, Repo, Number) ->
-  read_pull_request(User, Repo, Number, []).
-read_pull_request(User, Repo, Number, Options) ->
-  exec(octo_pull_request, read, [User, Repo, Number, Options]).
+list_pull_requests(User, Repo) -> list_pull_requests(User, Repo, []).
+list_pull_requests(User, Repo, Options) -> exec(octo_pull_request, list, [User, Repo, Options]).
 
-list_pull_request_commits(User, Repo, Number) ->
-  list_pull_request_commits(User, Repo, Number, []).
-list_pull_request_commits(User, Repo, Number, Options) ->
-  exec(octo_pull_request, list_commits, [User, Repo, Number, Options]).
+read_pull_request(User, Repo, Number) -> read_pull_request(User, Repo, Number, []).
+read_pull_request(User, Repo, Number, Options) -> exec(octo_pull_request, read, [User, Repo, Number, Options]).
 
-list_pull_request_files(User, Repo, Number) ->
-  list_pull_request_files(User, Repo, Number, []).
-list_pull_request_files(User, Repo, Number, Options) ->
-  exec(octo_pull_request, list_files, [User, Repo, Number, Options]).
+list_pull_request_commits(User, Repo, Number) -> list_pull_request_commits(User, Repo, Number, []).
+list_pull_request_commits(User, Repo, Number, Options) -> exec(octo_pull_request, list_commits, [User, Repo, Number, Options]).
 
-is_pull_request_merged(User, Repo, Number) ->
-  is_pull_request_merged(User, Repo, Number, []).
-is_pull_request_merged(User, Repo, Number, Options) ->
-  exec(octo_pull_request, is_merged, [User, Repo, Number, Options]).
+list_pull_request_files(User, Repo, Number) -> list_pull_request_files(User, Repo, Number, []).
+list_pull_request_files(User, Repo, Number, Options) -> exec(octo_pull_request, list_files, [User, Repo, Number, Options]).
 
-create_pull_request(User, Repo, Payload) ->
-  create_pull_request(User, Repo, Payload, []).
-create_pull_request(User, Repo, Payload, Options) ->
-  exec(octo_pull_request, create, [User, Repo, Payload, Options]).
+is_pull_request_merged(User, Repo, Number) -> is_pull_request_merged(User, Repo, Number, []).
+is_pull_request_merged(User, Repo, Number, Options) -> exec(octo_pull_request, is_merged, [User, Repo, Number, Options]).
 
-update_pull_request(User, Repo, Number, Payload) ->
-  update_pull_request(User, Repo, Number, Payload, []).
-update_pull_request(User, Repo, Number, Payload, Options) ->
-  exec(octo_pull_request, update, [User, Repo, Number, Payload, Options]).
+create_pull_request(User, Repo, Payload) -> create_pull_request(User, Repo, Payload, []).
+create_pull_request(User, Repo, Payload, Options) -> exec(octo_pull_request, create, [User, Repo, Payload, Options]).
 
-list_references(User, Repo) ->
-  list_references(User, Repo, []).
-list_references(User, Repo, Options) ->
-  exec(octo_reference, list, [User, Repo, Options]).
+update_pull_request(User, Repo, Number, Payload) -> update_pull_request(User, Repo, Number, Payload, []).
+update_pull_request(User, Repo, Number, Payload, Options) -> exec(octo_pull_request, update, [User, Repo, Number, Payload, Options]).
 
-list_branches(User, Repo) ->
-  list_branches(User, Repo, []).
-list_branches(User, Repo, Options) ->
-  exec(octo_reference, list_branches, [User, Repo, Options]).
+%%% References
 
-list_tags(User, Repo) ->
-  list_tags(User, Repo, []).
-list_tags(User, Repo, Options) ->
-  exec(octo_reference, list_tags, [User, Repo, Options]).
+list_references(User, Repo) -> list_references(User, Repo, []).
+list_references(User, Repo, Options) -> exec(octo_reference, list, [User, Repo, Options]).
+
+list_branches(User, Repo) -> list_branches(User, Repo, []).
+list_branches(User, Repo, Options) -> exec(octo_reference, list_branches, [User, Repo, Options]).
+
+list_tags(User, Repo) -> list_tags(User, Repo, []).
+list_tags(User, Repo, Options) -> exec(octo_reference, list_tags, [User, Repo, Options]).
+
 
 %% Internals
 
