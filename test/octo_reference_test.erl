@@ -24,15 +24,21 @@ list_branches_test() ->
 list_tags_test() ->
   {ok, Branches} = octo:list_tags("sdepold", "octo.erl-test", request_options()),
   RefNames       = [ Branch#octo_reference.ref || Branch <- Branches ],
-  ?assertEqual(RefNames, [<<"test">>]).
+  ?assertEqual(RefNames, [<<"omnom">>, <<"test">>]).
 
 read_tag_does_not_resolve_branch_names_test() ->
-  {State, _} = octo:read_tag("sdepold", "octo.erl-test", "master", request_options()),
-  ?assertEqual(State, err).
+  {err, _} = octo:read_tag("sdepold", "octo.erl-test", "master", request_options()).
 
 read_tag_with_valid_tag_name_test() ->
-  {ok, Tag} = octo:read_tag("sdepold", "octo.erl-test", "test", request_options()),
-  ?assertEqual(Tag#octo_reference.ref, <<"test">>).
+  {ok, Tag} = octo:read_tag("sdepold", "octo.erl-test", "omnom", request_options()),
+  ?assertEqual(Tag#octo_reference.ref, <<"omnom">>).
+
+read_branch_does_not_resolve_tag_names_test() ->
+  {err, _} = octo:read_branch("sdepold", "octo.erl-test", "omnom", request_options()).
+
+read_branch_with_valid_branch_name_test() ->
+  {ok, Branch} = octo:read_branch("sdepold", "octo.erl-test", "test/head", request_options()),
+  ?assertEqual(Branch#octo_reference.ref, <<"test/head">>).
 
 %% Helpers
 

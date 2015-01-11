@@ -16,7 +16,8 @@
   list_references/2, list_references/3,
   list_branches/2, list_branches/3,
   list_tags/2, list_tags/3,
-  read_tag/3, read_tag/4
+  read_tag/3, read_tag/4,
+  read_branch/3, read_branch/4
 ]).
 
 %% API
@@ -58,6 +59,8 @@ list_tags(User, Repo, Options) -> exec(octo_reference, list_tags, [User, Repo, O
 read_tag(User, Repo, TagName) -> read_tag(User, Repo, TagName, []).
 read_tag(User, Repo, TagName, Options) -> exec(octo_reference, read_tag, [User, Repo, TagName, Options]).
 
+read_branch(User, Repo, BranchName) -> read_branch(User, Repo, BranchName, []).
+read_branch(User, Repo, BranchName, Options) -> exec(octo_reference, read_branch, [User, Repo, BranchName, Options]).
 
 %% Internals
 
