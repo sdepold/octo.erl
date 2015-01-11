@@ -1,9 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## Not yet released
+## [0.2.0] - 2015-01-11 
 ### Added
 - list_references
+- Pagination options
 
 ## [0.1.0] - 2015-01-10
 ### Added
