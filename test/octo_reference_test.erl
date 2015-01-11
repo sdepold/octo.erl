@@ -5,13 +5,17 @@
 
 %% The tests
 
-list_test() ->
-  Options          = [{ all_pages }, { per_page, 100 }] ++ request_options(),
-  {ok, References} = octo:list_references("sdepold", "octo.erl-test", Options),
-  RefNames         = [ Reference#octo_reference.ref || Reference <- References ],
-  assertContainsBranches(RefNames),
-  assertContainsTags(RefNames),
-  assertContainsMisc(RefNames).
+list_test_() ->
+  {
+    timeout, 60, fun () ->
+      Options          = [{ all_pages }, { per_page, 100 }] ++ request_options(),
+      {ok, References} = octo:list_references("sdepold", "octo.erl-test", Options),
+      RefNames         = [ Reference#octo_reference.ref || Reference <- References ],
+      assertContainsBranches(RefNames),
+      assertContainsTags(RefNames),
+      assertContainsMisc(RefNames)
+    end
+  }.
 
 list_branches_test() ->
   {ok, Branches} = octo:list_branches("sdepold", "octo.erl-test", request_options()),
@@ -39,6 +43,18 @@ read_branch_does_not_resolve_tag_names_test() ->
 read_branch_with_valid_branch_name_test() ->
   {ok, Branch} = octo:read_branch("sdepold", "octo.erl-test", "test/head", request_options()),
   ?assertEqual(Branch#octo_reference.ref, <<"test/head">>).
+
+read_reference_test_() ->
+  {
+    timeout, 60, fun () ->
+      {ok, Branch} = octo:read_reference("sdepold", "octo.erl-test", "heads/test/head", request_options()),
+      ?assertEqual(Branch#octo_reference.ref, <<"refs/heads/test/head">>),
+      {ok, Tag} = octo:read_reference("sdepold", "octo.erl-test", "tags/omnom", request_options()),
+      ?assertEqual(Tag#octo_reference.ref, <<"refs/tags/omnom">>),
+      {ok, Pull} = octo:read_reference("sdepold", "octo.erl-test", "pull/1/merge", request_options()),
+      ?assertEqual(Pull#octo_reference.ref, <<"refs/pull/1/merge">>)
+    end
+  }.
 
 %% Helpers
 
