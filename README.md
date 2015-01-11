@@ -89,6 +89,9 @@ octo:update_pull_request(Username, ProjectName, Number, {
 octo:list_references(Username, ProjectName). % Returns a list of octo_references.
 octo:list_branches(Username, ProjectName). % Returns a list of branch octo_references.
 octo:list_tags(Username, ProjectName). % Returns a list of tag octo_references.
+octo:read_reference(Username, ProjectName, RefName). % Returns an instance of octo_reference.
+octo:read_branch(Username, ProjectName, BranchName). % Returns a branch instance of octo_reference.
+octo:read_tag(Username, ProjectName, TagName). % Returns a tag instance of octo_reference.
 ```
 
 ### Options
@@ -150,7 +153,7 @@ Options            = [{ all_pages }].
     - [ ] Get a Commit
     - [ ] Create a Commit
   - [ ] References
-    - [ ] Get a Reference
+    - [x] Get a Reference
     - [x] Get all References
     - [ ] Create a Reference
     - [ ] Update a Reference

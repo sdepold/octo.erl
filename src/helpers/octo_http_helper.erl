@@ -5,19 +5,19 @@
 ]).
 
 get(Url, Headers) ->
-  {ok, _StatusCode, _RespHeaders, ClientRef} = do_request(get, Url, Headers),
+  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(get, Url, Headers),
   {ok, Body} = hackney:body(ClientRef),
-  Body.
+  {status_code_to_tuple_state(StatusCode), Body}.
 
 post(Url, Headers, Payload) ->
-  {ok, _StatusCode, _RespHeaders, ClientRef} = do_request(post, Url, Headers, Payload),
+  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(post, Url, Headers, Payload),
   {ok, Body} = hackney:body(ClientRef),
-  Body.
+  {status_code_to_tuple_state(StatusCode), Body}.
 
 patch(Url, Headers, Payload) ->
-  {ok, _StatusCode, _RespHeaders, ClientRef} = do_request(patch, Url, Headers, Payload),
+  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(patch, Url, Headers, Payload),
   {ok, Body} = hackney:body(ClientRef),
-  Body.
+  {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, Headers) ->
   {ok, StatusCode, _RespHeaders, _ClientRef} = do_request(get, Url, Headers),
@@ -25,13 +25,13 @@ get_response_status_code(Url, Headers) ->
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
 read_collection(Thing, Args, _Options) ->
-  Fun     = list_to_atom(atom_to_list(Thing) ++ "_url"),
-  Url     = erlang:apply(octo_url_helper, Fun, Args),
-  Options = check_pagination_options(_Options),
-  Query   = options_to_query_params(Options),
-  FullUrl = octo_list_helper:join("?", [Url, Query]),
-  Json    = get(FullUrl, Options),
-  Result  = jsonerl:decode(Json),
+  Fun        = list_to_atom(atom_to_list(Thing) ++ "_url"),
+  Url        = erlang:apply(octo_url_helper, Fun, Args),
+  Options    = check_pagination_options(_Options),
+  Query      = options_to_query_params(Options),
+  FullUrl    = octo_list_helper:join("?", [Url, Query]),
+  {ok, Json} = get(FullUrl, Options),
+  Result     = jsonerl:decode(Json),
   case continue_read_collection(Options, Result) of
     true  -> Result ++ read_collection(Thing, Args, increase_page(Options));
     false -> Result
@@ -42,6 +42,12 @@ options_to_query_params(Options) ->
   octo_list_helper:join("&", Fragments).
 
 %% Internals
+
+status_code_to_tuple_state(StatusCode) ->
+  case round(StatusCode / 100) of
+    2 -> ok;
+    _ -> err
+  end.
 
 do_request(Method, Url, Headers) ->
   do_request(Method, Url, Headers, <<>>, []).

@@ -1,7 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.2.0] - 2015-01-11 
+## Unreleased
+### Added
+- read_reference
+- read_branch
+- read_tag
+
+## [0.2.0] - 2015-01-11
 ### Added
 - list_references
 - Pagination options
