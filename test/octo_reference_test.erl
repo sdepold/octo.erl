@@ -26,6 +26,14 @@ list_tags_test() ->
   RefNames       = [ Branch#octo_reference.ref || Branch <- Branches ],
   ?assertEqual(RefNames, [<<"test">>]).
 
+read_tag_does_not_resolve_branch_names_test() ->
+  {State, _} = octo:read_tag("sdepold", "octo.erl-test", "master", request_options()),
+  ?assertEqual(State, err).
+
+read_tag_with_valid_tag_name_test() ->
+  {ok, Tag} = octo:read_tag("sdepold", "octo.erl-test", "test", request_options()),
+  ?assertEqual(Tag#octo_reference.ref, <<"test">>).
+
 %% Helpers
 
 assertContainsBranches(RefNames) ->

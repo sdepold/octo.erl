@@ -4,7 +4,7 @@
   pull_request_files_url/3, pull_request_merged_url/3
 ]).
 -export([
-  reference_url/2, branch_url/2, tag_url/2
+  reference_url/2, branch_url/2, tag_url/2, tag_url/3
 ]).
 
 repo_url(Owner, Repo) ->
@@ -33,3 +33,6 @@ branch_url(Owner, Repo) ->
 
 tag_url(Owner, Repo) ->
   reference_url(Owner, Repo) ++ "/tags".
+
+tag_url(Owner, Repo, TagName) ->
+  tag_url(Owner, Repo) ++ "/" ++ TagName.

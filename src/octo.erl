@@ -15,7 +15,8 @@
 -export([
   list_references/2, list_references/3,
   list_branches/2, list_branches/3,
-  list_tags/2, list_tags/3
+  list_tags/2, list_tags/3,
+  read_tag/3, read_tag/4
 ]).
 
 %% API
@@ -53,6 +54,9 @@ list_branches(User, Repo, Options) -> exec(octo_reference, list_branches, [User,
 
 list_tags(User, Repo) -> list_tags(User, Repo, []).
 list_tags(User, Repo, Options) -> exec(octo_reference, list_tags, [User, Repo, Options]).
+
+read_tag(User, Repo, TagName) -> read_tag(User, Repo, TagName, []).
+read_tag(User, Repo, TagName, Options) -> exec(octo_reference, read_tag, [User, Repo, TagName, Options]).
 
 
 %% Internals
