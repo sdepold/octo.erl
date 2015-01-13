@@ -1,18 +1,32 @@
 -module(octo_reference).
 -include("octo.hrl").
 -export([
-  list/3, list_branches/3, list_tags/3, read/4, read_tag/4, read_branch/4
+  list/3, list_branches/3, list_tags/3,
+  read/4, read_tag/4, read_branch/4,
+  create/4,
+  delete/4
 ]).
+-include_lib("eunit/include/eunit.hrl").
 
 %% API
 
-list(Owner, Repo, Options)          -> list_references(reference, Owner, Repo, [{ skip_ref_modification }|Options]).
+list(Owner, Repo, Options) -> list_references(reference, Owner, Repo, [{ skip_ref_modification }|Options]).
 list_branches(Owner, Repo, Options) -> list_references(branch, Owner, Repo, Options).
-list_tags(Owner, Repo, Options)     -> list_references(tag, Owner, Repo, Options).
+list_tags(Owner, Repo, Options) -> list_references(tag, Owner, Repo, Options).
 
-read(Owner, Repo, RefName, Options)           -> read_reference(reference, Owner, Repo, RefName, [{ skip_ref_modification }|Options]).
-read_tag(Owner, Repo, TagName, Options)       -> read_reference(tag, Owner, Repo, TagName, Options).
+read(Owner, Repo, RefName, Options) -> read_reference(reference, Owner, Repo, RefName, [{ skip_ref_modification }|Options]).
+read_tag(Owner, Repo, TagName, Options) -> read_reference(tag, Owner, Repo, TagName, Options).
 read_branch(Owner, Repo, BranchName, Options) -> read_reference(branch, Owner, Repo, BranchName, Options).
+
+create(Owner, Repo, Payload, Options) ->
+  Url          = octo_url_helper:reference_url(Owner, Repo),
+  PayloadJson  = jsonerl:encode(Payload),
+  {ok, Result} = octo_http_helper:post(Url, Options, PayloadJson),
+  {ok, ?json_to_record(octo_reference, Result)}.
+
+delete(Owner, Repo, RefName, Options) ->
+  Url = octo_url_helper:reference_url(Owner, Repo, RefName),
+  octo_http_helper:delete(Url, Options).
 
 %% Internals
 

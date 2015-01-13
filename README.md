@@ -92,6 +92,13 @@ octo:list_tags(Username, ProjectName). % Returns a list of tag octo_references.
 octo:read_reference(Username, ProjectName, RefName). % Returns an instance of octo_reference.
 octo:read_branch(Username, ProjectName, BranchName). % Returns a branch instance of octo_reference.
 octo:read_tag(Username, ProjectName, TagName). % Returns a tag instance of octo_reference.
+
+octo:create_reference(Username, ProjectName, {
+  {<<"ref">>, <<"refs/heads/featureA">>},
+  {<<"sha">>, <<"aa218f56b14c9653891f9e74264a383fa43fefbd">>}
+}). % Returns the just created octo_reference.
+
+octo:delete_reference(Username, ProjectName, RefName). % No response.
 ```
 
 ### Options
@@ -155,9 +162,9 @@ Options            = [{ all_pages }].
   - [ ] References
     - [x] Get a Reference
     - [x] Get all References
-    - [ ] Create a Reference
+    - [x] Create a Reference
     - [ ] Update a Reference
-    - [ ] Delete a Reference
+    - [x] Delete a Reference
   - [ ] Tags
     - [ ] Get a Tag
     - [ ] Create a Tag Object

@@ -1,6 +1,6 @@
 -module(octo_http_helper).
 -export([
-  get/2, post/3, patch/3, read_collection/3, get_response_status_code/2,
+  get/2, delete/2, post/3, patch/3, read_collection/3, get_response_status_code/2,
   options_to_query_params/1
 ]).
 
@@ -8,6 +8,10 @@ get(Url, Headers) ->
   {ok, StatusCode, _RespHeaders, ClientRef} = do_request(get, Url, Headers),
   {ok, Body} = hackney:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
+
+delete(Url, Headers) ->
+  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(delete, Url, Headers),
+  {status_code_to_tuple_state(StatusCode), null}.
 
 post(Url, Headers, Payload) ->
   {ok, StatusCode, _RespHeaders, ClientRef} = do_request(post, Url, Headers, Payload),

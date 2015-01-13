@@ -56,6 +56,18 @@ read_reference_test_() ->
     end
   }.
 
+create_reference_test_() ->
+  {
+    timeout, 60, fun () ->
+      {ok, Reference} = octo:create_reference("sdepold", "octo.erl-test", {
+        {<<"ref">>, <<"refs/heads/test/another-head">>},
+        {<<"sha">>, <<"f5fab067ab146c389f6661046695fb0bbe1608b0">>}
+      }, request_options()),
+      {ok, _} = octo:delete_reference("sdepold", "octo.erl-test", "heads/test/another-head", request_options()),
+      ?assertEqual(Reference#octo_reference.ref, <<"refs/heads/test/another-head">>)
+    end
+  }.
+
 %% Helpers
 
 assertContainsBranches(RefNames) ->
