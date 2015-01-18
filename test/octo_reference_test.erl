@@ -47,12 +47,27 @@ read_branch_with_valid_branch_name_test() ->
 read_reference_test_() ->
   {
     timeout, 60, fun () ->
+      ExpectedBranchRef = "refs/heads/test/head",
       {ok, Branch} = octo:read_reference("sdepold", "octo.erl-test", "heads/test/head", request_options()),
-      ?assertEqual(Branch#octo_reference.ref, <<"refs/heads/test/head">>),
+      ?assertEqual(Branch#octo_reference.ref, list_to_binary(ExpectedBranchRef)),
+      {ok, FullReferencedBranch} = octo:read_reference("sdepold", "octo.erl-test", ExpectedBranchRef, request_options()),
+      ?assertEqual(FullReferencedBranch#octo_reference.ref, list_to_binary(ExpectedBranchRef)),
       {ok, Tag} = octo:read_reference("sdepold", "octo.erl-test", "tags/omnom", request_options()),
       ?assertEqual(Tag#octo_reference.ref, <<"refs/tags/omnom">>),
       {ok, Pull} = octo:read_reference("sdepold", "octo.erl-test", "pull/1/merge", request_options()),
       ?assertEqual(Pull#octo_reference.ref, <<"refs/pull/1/merge">>)
+    end
+  }.
+
+create_reference_test_() ->
+  {
+    timeout, 60, fun () ->
+      {ok, Reference} = octo:create_reference("sdepold", "octo.erl-test", {
+        {<<"ref">>, <<"refs/heads/test/another-head">>},
+        {<<"sha">>, <<"f5fab067ab146c389f6661046695fb0bbe1608b0">>}
+      }, request_options()),
+      {ok, _} = octo:delete_reference("sdepold", "octo.erl-test", "heads/test/another-head", request_options()),
+      ?assertEqual(Reference#octo_reference.ref, <<"refs/heads/test/another-head">>)
     end
   }.
 

@@ -64,34 +64,192 @@ The following paragraphs are describing the existing functions.
 #### Pull Request
 
 ```erlang
-octo:read_pull_request(Username, ProjectName, Number). % Returns a octo_pull_request records.
-octo:list_pull_requests(Username, ProjectName). % Returns a list of octo_pull_request records.
-octo:list_pull_request_commits(Username, ProjectName, Number). % Returns a list of octo_commit records.
-octo:list_pull_request_files(Username, ProjectName, Number). % Returns a list of octo_file records.
-octo:is_pull_request_merged(Username, ProjectName, Number). % Returns a whether or not a pull request is merged.
-octo:create_pull_request(Username, ProjectName, {
-  {<<"title">>, <<"Pull request title">>},
-  {<<"body">>, <<"Pull request description">>},
-  {<<"head">>, <<"Head branch">>},
-  {<<"base">>, <<"Base branch">>}
-}). % Returns the just created pull request.
-octo:update_pull_request(Username, ProjectName, Number, {
-  % The following options are possible:
-  {<<"state">>, <<"closed">>},
-  {<<"title">>, <<"Another title">>},
-  {<<"body">>, <<"Another body">>}
-}). % Returns the updated pull request.
+%% Reading a specific pull request of a repository.
+%%
+%% Args:
+%% - Owner:  Owner of the repository. Char list.
+%% - Repo:   Name of the repository. Char list.
+%% - Number: The (repo scoped) number of the pull request. Integer.
+%%
+%% Returns an octo_pull_request record.
+octo:read_pull_request(Owner, Repo, Number).
+
+%% Reading all pull request of a repository.
+%%
+%% Args:
+%% - Owner: Owner of the repository. Char list.
+%% - Repo:  Name of the repository. Char list.
+%%
+%% Returns a list of octo_pull_request records.
+octo:list_pull_requests(Owner, Repo).
+
+%% Reading a pull request's commits.
+%%
+%% Args:
+%% - Owner:  Owner of the repository. Char list.
+%% - Repo:   Name of the repository. Char list.
+%% - Number: The (repo scoped) number of the pull request. Integer.
+%%
+%% Returns an octo_commit record.
+octo:list_pull_request_commits(Owner, Repo, Number).
+
+%% Reading a pull request's files.
+%%
+%% Args:
+%% - Owner:  Owner of the repository. Char list.
+%% - Repo:   Name of the repository. Char list.
+%% - Number: The (repo scoped) number of the pull request. Integer.
+%%
+%% Returns a list of octo_file records.
+octo:list_pull_request_files(Owner, Repo, Number).
+
+%% Determing whether a pull request is merged.
+%%
+%% Args:
+%% - Owner:  Owner of the repository. Char list.
+%% - Repo:   Name of the repository. Char list.
+%% - Number: The (repo scoped) number of the pull request. Integer.
+%%
+%% Returns a whether or not a pull request is merged.
+octo:is_pull_request_merged(Owner, Repo, Number).
+
+%% Creating a pull request in a repository.
+%%
+%% Args:
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - Payload: Meta information about the to be created PR. Tuple of tuples.
+%%     Example:
+%%     {
+%%       {<<"title">>, <<"Pull request title">>},
+%%       {<<"body">>, <<"Pull request description">>},
+%%       {<<"head">>, <<"Head branch">>},
+%%       {<<"base">>, <<"Base branch">>}
+%%     }
+%%
+%% Returns the just created pull request.
+octo:create_pull_request(Owner, Repo, Payload).
+
+%% Update a pull request.
+%%
+%% Args:
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - Number:  The (repo scoped) number of the pull request. Integer.
+%% - Payload: Meta information about the update. Tuple of tuples.
+%%     Example:
+%%     {
+%%       {<<"state">>, <<"closed">>},
+%%       {<<"title">>, <<"Another title">>},
+%%       {<<"body">>, <<"Another body">>}
+%%     }
+%%
+%% Returns the updated pull request.
+octo:update_pull_request(Owner, Repo, Number, Payload).
 ```
 
 #### References
 
 ```erlang
-octo:list_references(Username, ProjectName). % Returns a list of octo_references.
-octo:list_branches(Username, ProjectName). % Returns a list of branch octo_references.
-octo:list_tags(Username, ProjectName). % Returns a list of tag octo_references.
-octo:read_reference(Username, ProjectName, RefName). % Returns an instance of octo_reference.
-octo:read_branch(Username, ProjectName, BranchName). % Returns a branch instance of octo_reference.
-octo:read_tag(Username, ProjectName, TagName). % Returns a tag instance of octo_reference.
+%% List all references of a repository.
+%%
+%% Args
+%% - Owner: Owner of the repository. Char list.
+%% - Repo:  Name of the repository. Char list.
+%%
+%% Returns a list of octo_references.
+octo:list_references(Owner, Repo).
+
+%% List all branches of a repository.
+%%
+%% Args
+%% - Owner: Owner of the repository. Char list.
+%% - Repo:  Name of the repository. Char list.
+%%
+%% Returns a list of branch octo_references.
+octo:list_branches(Owner, Repo).
+
+%% List all tags of a repository.
+%%
+%% Args
+%% - Owner: Owner of the repository. Char list.
+%% - Repo:  Name of the repository. Char list.
+%%
+%% Returns a list of tag octo_references.
+octo:list_tags(Owner, Repo).
+
+%% Read a specific reference of a repository.
+%%
+%% Args
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - RefName: The to be read reference. Char list.
+%%     Valid examples:
+%%     - refs/heads/my-branch
+%%     - heads/my-branch
+%%     - tags/my-tag
+%%
+%% Returns a list of tag octo_references.
+octo:read_reference(Owner, Repo, RefName).
+
+%% Read a specific branch of a repository.
+%%
+%% Args
+%% - Owner:      Owner of the repository. Char list.
+%% - Repo:       Name of the repository. Char list.
+%% - BranchName: The to be read branch. Char list.
+%%     Valid examples:
+%%     - my-branch
+%%     Invalid examples:
+%%     - heads/my-branch
+%%     - refs/heads/my-branch
+%%
+%% Returns a branch instance of octo_reference.
+octo:read_branch(Owner, Repo, BranchName).
+
+%% Read a specific tag of a repository.
+%%
+%% Args
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - TagName: The to be read tag. Char list.
+%%     Valid examples:
+%%     - v1.2.3
+%%     Invalid examples:
+%%     - tags/v1.2.3
+%%     - refs/tags/v1.2.3
+%%
+%% Returns a tag instance of octo_reference.
+octo:read_tag(Owner, Repo, TagName).
+
+%% Creating a reference in a repository.
+%%
+%% Args:
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - Payload: Meta information about the to be created reference. Tuple of tuples.
+%%     Example:
+%%     {
+%%       {<<"ref">>, <<"refs/heads/featureA">>},
+%%       {<<"sha">>, <<"aa218f56b14c9653891f9e74264a383fa43fefbd">>}
+%%     }
+%%
+%% Returns the just created octo_reference.
+octo:create_reference(Owner, Repo, Payload).
+
+%% Delete a specific reference of a repository.
+%%
+%% Args
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - RefName: The to be read reference. Char list.
+%%     Valid examples:
+%%     - refs/heads/my-branch
+%%     - heads/my-branch
+%%     - tags/my-tag
+%%
+%% Returns {ok, null}.
+octo:delete_reference(Owner, Repo, RefName).
 ```
 
 ### Options
@@ -106,7 +264,7 @@ information about this topic here: https://github.com/blog/1509-personal-api-tok
 
 ```erlang
 Options           = [{ auth, pat, "your_personal_api_token" }].
-{ok, PullRequest} = octo:read_pull_request(Username, ProjectName, Number, Options).
+{ok, PullRequest} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
 
 #### Pagination
@@ -116,7 +274,7 @@ You can configure the pagination like this:
 
 ```erlang
 Options            = [{ page, 1 }, { per_page, 100 }].
-{ok, PullRequests} = octo:read_pull_request(Username, ProjectName, Number, Options).
+{ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
 
 #### Reading all entries
@@ -126,7 +284,7 @@ pages automatically:
 
 ```erlang
 Options            = [{ all_pages }].
-{ok, PullRequests} = octo:read_pull_request(Username, ProjectName, Number, Options).
+{ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
 
 ## Implementation state
@@ -155,9 +313,9 @@ Options            = [{ all_pages }].
   - [ ] References
     - [x] Get a Reference
     - [x] Get all References
-    - [ ] Create a Reference
+    - [x] Create a Reference
     - [ ] Update a Reference
-    - [ ] Delete a Reference
+    - [x] Delete a Reference
   - [ ] Tags
     - [ ] Get a Tag
     - [ ] Create a Tag Object
