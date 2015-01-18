@@ -26,8 +26,8 @@ list_branches_test() ->
   ).
 
 list_tags_test() ->
-  {ok, Branches} = octo:list_tags("sdepold", "octo.erl-test", request_options()),
-  RefNames       = [ Branch#octo_reference.ref || Branch <- Branches ],
+  {ok, Tags} = octo:list_tags("sdepold", "octo.erl-test", request_options()),
+  RefNames   = [ Tag#octo_reference.ref || Tag <- Tags ],
   ?assertEqual(RefNames, [<<"omnom">>, <<"test">>]).
 
 read_tag_does_not_resolve_branch_names_test() ->
@@ -78,8 +78,29 @@ create_branch_test_() ->
         "sdepold", "octo.erl-test", "test/another-head",
         "f5fab067ab146c389f6661046695fb0bbe1608b0", request_options()
       ),
-      {ok, _} = octo:delete_branch("sdepold", "octo.erl-test", "test/another-head", request_options()),
-      ?assertEqual(Branch#octo_reference.ref, <<"test/another-head">>)
+      ?assertEqual(Branch#octo_reference.ref, <<"test/another-head">>),
+      {ok, Branches} = octo:list_branches("sdepold", "octo.erl-test", request_options()),
+      RefNames       = [ Branch#octo_reference.ref || Branch <- Branches ],
+      ?assertEqual(
+        RefNames,
+        [<<"master">>, <<"test/another-head">>, <<"test/base">>, <<"test/head">>]
+      ),
+      {ok, _} = octo:delete_branch("sdepold", "octo.erl-test", "test/another-head", request_options())
+    end
+  }.
+
+create_tag_test_() ->
+  {
+    timeout, 60, fun () ->
+      {ok, Tag} = octo:create_tag(
+        "sdepold", "octo.erl-test", "another-tag",
+        "f5fab067ab146c389f6661046695fb0bbe1608b0", request_options()
+      ),
+      ?assertEqual(Tag#octo_reference.ref, <<"another-tag">>),
+      {ok, Tags} = octo:list_tags("sdepold", "octo.erl-test", request_options()),
+      RefNames   = [ Tag#octo_reference.ref || Tag <- Tags ],
+      ?assertEqual(RefNames, [<<"another-tag">>, <<"omnom">>, <<"test">>]),
+      {ok, _} = octo:delete_tag("sdepold", "octo.erl-test", "another-tag", request_options())
     end
   }.
 

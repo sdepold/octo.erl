@@ -248,12 +248,23 @@ octo:create_reference(Owner, Repo, Payload).
 %% Returns the just created branch octo_reference.
 octo:create_branch(Owner, Repo, BranchName, Source).
 
+%% Creating a tag in a repository.
+%%
+%% Args:
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - TagName: Name of the to be created tag. Char list.
+%% - Source:  The sha from which to create the tag from. Char list.
+%%
+%% Returns the just created branch octo_reference.
+octo:create_tag(Owner, Repo, TagName, Source).
+
 %% Delete a specific reference of a repository.
 %%
 %% Args
 %% - Owner:   Owner of the repository. Char list.
 %% - Repo:    Name of the repository. Char list.
-%% - RefName: The to be read reference. Char list.
+%% - RefName: Name of the to be deleted reference. Char list.
 %%     Valid examples:
 %%     - refs/heads/my-branch
 %%     - heads/my-branch
@@ -267,12 +278,24 @@ octo:delete_reference(Owner, Repo, RefName).
 %% Args
 %% - Owner:      Owner of the repository. Char list.
 %% - Repo:       Name of the repository. Char list.
-%% - BranchName: The to be read reference. Char list.
+%% - BranchName: Name of the to be deleted branch. Char list.
 %%     Valid examples:
 %%     - my-branch
 %%
 %% Returns {ok, null}.
 octo:delete_branch(Owner, Repo, BranchName).
+
+%% Delete a specific tag of a repository.
+%%
+%% Args
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - TagName: Name of the to be deleted tag. Char list.
+%%     Valid examples:
+%%     - my-tag
+%%
+%% Returns {ok, null}.
+octo:delete_tag(Owner, Repo, TagName).
 ```
 
 ### Options

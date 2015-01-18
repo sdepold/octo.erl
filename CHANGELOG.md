@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 - delete_reference
 - create_branch
 - delete_branch
+- create_tag
+- delete_tag
 
 ## [0.3.0] - 2015-01-11
 ### Added
