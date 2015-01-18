@@ -71,6 +71,18 @@ create_reference_test_() ->
     end
   }.
 
+create_branch_test_() ->
+  {
+    timeout, 60, fun () ->
+      {ok, Branch} = octo:create_branch(
+        "sdepold", "octo.erl-test", "test/another-head",
+        "f5fab067ab146c389f6661046695fb0bbe1608b0", request_options()
+      ),
+      {ok, _} = octo:delete_branch("sdepold", "octo.erl-test", "test/another-head", request_options()),
+      ?assertEqual(Branch#octo_reference.ref, <<"test/another-head">>)
+    end
+  }.
+
 %% Helpers
 
 assertContainsBranches(RefNames) ->
