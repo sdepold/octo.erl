@@ -3,8 +3,8 @@
 -export([
   list/3, list_branches/3, list_tags/3,
   read/4, read_tag/4, read_branch/4,
-  create/4, create_branch/5,
-  delete/4, delete_branch/4
+  create/4, create_branch/5, create_tag/5,
+  delete/4, delete_branch/4, delete_tag/4
 ]).
 
 %% API
@@ -30,6 +30,13 @@ create_branch(Owner, Repo, BranchName, Source, Options) ->
   }, Options),
   {ok, truncate_ref(Record)}.
 
+create_tag(Owner, Repo, TagName, Source, Options) ->
+  {ok, Record} = create(Owner, Repo, {
+    {<<"ref">>, list_to_binary("refs/tags/" ++ TagName)},
+    {<<"sha">>, list_to_binary(Source)}
+  }, Options),
+  {ok, truncate_ref(Record)}.
+
 delete(Owner, Repo, "refs/" ++ RefName, Options) ->
   delete(Owner, Repo, RefName, Options);
 
@@ -39,6 +46,9 @@ delete(Owner, Repo, RefName, Options) ->
 
 delete_branch(Owner, Repo, BranchName, Options) ->
   delete(Owner, Repo, "refs/heads/" ++ BranchName, Options).
+
+delete_tag(Owner, Repo, TagName, Options) ->
+  delete(Owner, Repo, "refs/tags/" ++ TagName, Options).
 
 %% Internals
 
