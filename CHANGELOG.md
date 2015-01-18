@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## [0.4.0] - 2015-01-18 
 ### Added
 - create_reference
 - delete_reference
