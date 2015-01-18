@@ -35,6 +35,9 @@ list_references(Type, Owner, Repo, Options) ->
   Result     = [ struct_to_record(Reference, Options) || (Reference) <- References ],
   {ok, Result}.
 
+read_reference(Type, Owner, Repo, "refs/" ++ RefName, Options) ->
+  read_reference(Type, Owner, Repo, RefName, Options);
+
 read_reference(Type, Owner, Repo, RefName, Options) ->
   Fun           = list_to_atom(atom_to_list(Type) ++ "_url"),
   Url           = erlang:apply(octo_url_helper, Fun, [Owner, Repo, RefName]),
