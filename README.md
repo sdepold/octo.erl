@@ -237,6 +237,17 @@ octo:read_tag(Owner, Repo, TagName).
 %% Returns the just created octo_reference.
 octo:create_reference(Owner, Repo, Payload).
 
+%% Creating a branch in a repository.
+%%
+%% Args:
+%% - Owner:      Owner of the repository. Char list.
+%% - Repo:       Name of the repository. Char list.
+%% - BranchName: Name of the to be created branch. Char list.
+%% - Source:     The sha from which to create the branch from. Char list.
+%%
+%% Returns the just created branch octo_reference.
+octo:create_branch(Owner, Repo, BranchName, Source).
+
 %% Delete a specific reference of a repository.
 %%
 %% Args
@@ -250,6 +261,18 @@ octo:create_reference(Owner, Repo, Payload).
 %%
 %% Returns {ok, null}.
 octo:delete_reference(Owner, Repo, RefName).
+
+%% Delete a specific branch of a repository.
+%%
+%% Args
+%% - Owner:      Owner of the repository. Char list.
+%% - Repo:       Name of the repository. Char list.
+%% - BranchName: The to be read reference. Char list.
+%%     Valid examples:
+%%     - my-branch
+%%
+%% Returns {ok, null}.
+octo:delete_branch(Owner, Repo, BranchName).
 ```
 
 ### Options

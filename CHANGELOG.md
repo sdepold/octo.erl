@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - create_reference
 - delete_reference
+- create_branch
+- delete_branch
 
 ## [0.3.0] - 2015-01-11
 ### Added

@@ -19,8 +19,8 @@
   read_reference/3, read_reference/4,
   read_tag/3, read_tag/4,
   read_branch/3, read_branch/4,
-  create_reference/3, create_reference/4,
-  delete_reference/3, delete_reference/4
+  create_reference/3, create_reference/4, create_branch/4, create_branch/5,
+  delete_reference/3, delete_reference/4, delete_branch/3, delete_branch/4
 ]).
 
 %% API
@@ -71,8 +71,14 @@ read_branch(User, Repo, BranchName, Options) -> exec(octo_reference, read_branch
 create_reference(User, Repo, Payload) -> create_reference(User, Repo, Payload, []).
 create_reference(User, Repo, Payload, Options) -> exec(octo_reference, create, [User, Repo, Payload, Options]).
 
+create_branch(User, Repo, BranchName, Source) -> create_branch(User, Repo, BranchName, Source, []).
+create_branch(User, Repo, BranchName, Source, Options) -> exec(octo_reference, create_branch, [User, Repo, BranchName, Source, Options]).
+
 delete_reference(User, Repo, RefName) -> delete_reference(User, Repo, RefName, []).
 delete_reference(User, Repo, RefName, Options) -> exec(octo_reference, delete, [User, Repo, RefName, Options]).
+
+delete_branch(User, Repo, BranchName) -> delete_branch(User, Repo, BranchName, []).
+delete_branch(User, Repo, BranchName, Options) -> exec(octo_reference, delete_branch, [User, Repo, BranchName, Options]).
 
 %% Internals
 

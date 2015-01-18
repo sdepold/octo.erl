@@ -3,10 +3,9 @@
 -export([
   list/3, list_branches/3, list_tags/3,
   read/4, read_tag/4, read_branch/4,
-  create/4,
-  delete/4
+  create/4, create_branch/5,
+  delete/4, delete_branch/4
 ]).
--include_lib("eunit/include/eunit.hrl").
 
 %% API
 
@@ -24,9 +23,22 @@ create(Owner, Repo, Payload, Options) ->
   {ok, Result} = octo_http_helper:post(Url, Options, PayloadJson),
   {ok, ?json_to_record(octo_reference, Result)}.
 
+create_branch(Owner, Repo, BranchName, Source, Options) ->
+  {ok, Record} = create(Owner, Repo, {
+    {<<"ref">>, list_to_binary("refs/heads/" ++ BranchName)},
+    {<<"sha">>, list_to_binary(Source)}
+  }, Options),
+  {ok, truncate_ref(Record)}.
+
+delete(Owner, Repo, "refs/" ++ RefName, Options) ->
+  delete(Owner, Repo, RefName, Options);
+
 delete(Owner, Repo, RefName, Options) ->
   Url = octo_url_helper:reference_url(Owner, Repo, RefName),
   octo_http_helper:delete(Url, Options).
+
+delete_branch(Owner, Repo, BranchName, Options) ->
+  delete(Owner, Repo, "refs/heads/" ++ BranchName, Options).
 
 %% Internals
 
@@ -52,6 +64,9 @@ struct_to_record(Struct, [{ skip_ref_modification }|_]) ->
 
 struct_to_record(Struct, _) ->
   Record = ?struct_to_record(octo_reference, Struct),
+  truncate_ref(Record).
+
+truncate_ref(Record) ->
   OldRef = Record#octo_reference.ref,
   NewRef = binary:replace(OldRef, [<<"refs/heads/">>, <<"refs/tags/">>], <<"">>),
   Record#octo_reference{ref=NewRef}.
