@@ -104,6 +104,29 @@ create_tag_test_() ->
     end
   }.
 
+update_reference_test_() ->
+  {
+    timeout, 60, fun () ->
+      {ok, MasterBranch}                = octo:read_branch("sdepold", "octo.erl-test", "master", request_options()),
+      {ok, TestHeadBranch}              = octo:read_branch("sdepold", "octo.erl-test", "test/head", request_options()),
+      {{<<"sha">>, MasterSha}, _, _}    = MasterBranch#octo_reference.object,
+      {{<<"sha">>, TestHeadSha}, _, _}  = TestHeadBranch#octo_reference.object,
+      {ok, NewMasterBranch}             = octo:create_branch("sdepold", "octo.erl-test", "test/master", binary_to_list(MasterSha), request_options()),
+      {{<<"sha">>, NewMasterSha}, _, _} = NewMasterBranch#octo_reference.object,
+
+      ?assertEqual(NewMasterBranch#octo_reference.ref, <<"test/master">>),
+      ?assertEqual(NewMasterSha, MasterSha),
+
+      Payload                                  = {{<<"sha">>, TestHeadSha}, {<<"force">>, true}},
+      {ok, UpdatedNewMasterBranch}             = octo:update_reference("sdepold", "octo.erl-test", "refs/heads/test/master", Payload, request_options()),
+      {{<<"sha">>, UpdatedNewMasterSha}, _, _} = UpdatedNewMasterBranch#octo_reference.object,
+
+      ?assertEqual(UpdatedNewMasterSha, TestHeadSha),
+
+      {ok, _} = octo:delete_branch("sdepold", "octo.erl-test", "test/master", request_options())
+    end
+  }.
+
 %% Helpers
 
 assertContainsBranches(RefNames) ->

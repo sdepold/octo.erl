@@ -4,6 +4,7 @@
   list/3, list_branches/3, list_tags/3,
   read/4, read_tag/4, read_branch/4,
   create/4, create_branch/5, create_tag/5,
+  update/5,
   delete/4, delete_branch/4, delete_tag/4
 ]).
 
@@ -37,9 +38,16 @@ create_tag(Owner, Repo, TagName, Source, Options) ->
   }, Options),
   {ok, truncate_ref(Record)}.
 
+update(Owner, Repo, "refs/" ++ RefName, Payload, Options) ->
+  update(Owner, Repo, RefName, Payload, Options);
+update(Owner, Repo, RefName, Payload, Options) ->
+  Url          = octo_url_helper:reference_url(Owner, Repo, RefName),
+  PayloadJson  = jsonerl:encode(Payload),
+  {ok, Result} = octo_http_helper:patch(Url, Options, PayloadJson),
+  {ok, ?json_to_record(octo_reference, Result)}.
+
 delete(Owner, Repo, "refs/" ++ RefName, Options) ->
   delete(Owner, Repo, RefName, Options);
-
 delete(Owner, Repo, RefName, Options) ->
   Url = octo_url_helper:reference_url(Owner, Repo, RefName),
   octo_http_helper:delete(Url, Options).
