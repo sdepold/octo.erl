@@ -259,6 +259,24 @@ octo:create_branch(Owner, Repo, BranchName, Source).
 %% Returns the just created branch octo_reference.
 octo:create_tag(Owner, Repo, TagName, Source).
 
+%% Updating a reference in a repository.
+%%
+%% Args:
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - RefName: Name of the to be created tag. Char list.
+%%     - Valid examples:   refs/heads/my-branch, heads/my-branch, refs/tags/my-tag, tags/my-tag
+%%     - Invalid examples: my-branch, my-tag
+%% - Payload: Meta information about the to be updated reference. Tuple of tuples.
+%%     Example:
+%%     {
+%%       {<<"sha">>, <<"aa218f56b14c9653891f9e74264a383fa43fefbd">>},
+%%       {<<"force">>, true|false}
+%%     }
+%%
+%% Returns the just updated branch octo_reference.
+octo:update_reference(Owner, Repo, RefName, Payload).
+
 %% Delete a specific reference of a repository.
 %%
 %% Args
@@ -356,11 +374,11 @@ Options            = [{ all_pages }].
   - [ ] Commits
     - [ ] Get a Commit
     - [ ] Create a Commit
-  - [ ] References
+  - [x] References
     - [x] Get a Reference
     - [x] Get all References
     - [x] Create a Reference
-    - [ ] Update a Reference
+    - [x] Update a Reference
     - [x] Delete a Reference
   - [ ] Tags
     - [ ] Get a Tag

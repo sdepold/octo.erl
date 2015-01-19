@@ -20,6 +20,7 @@
   read_tag/3, read_tag/4,
   read_branch/3, read_branch/4,
   create_reference/3, create_reference/4, create_branch/4, create_branch/5, create_tag/4, create_tag/5,
+  update_reference/4, update_reference/5,
   delete_reference/3, delete_reference/4, delete_branch/3, delete_branch/4, delete_tag/3, delete_tag/4
 ]).
 
@@ -76,6 +77,9 @@ create_branch(User, Repo, BranchName, Source, Options) -> exec(octo_reference, c
 
 create_tag(User, Repo, TagName, Source) -> create_tag(User, Repo, TagName, Source, []).
 create_tag(User, Repo, TagName, Source, Options) -> exec(octo_reference, create_tag, [User, Repo, TagName, Source, Options]).
+
+update_reference(User, Repo, RefName, Payload) -> update_reference(User, Repo, RefName, Payload, []).
+update_reference(User, Repo, RefName, Payload, Options) -> exec(octo_reference, update, [User, Repo, RefName, Payload, Options]).
 
 delete_reference(User, Repo, RefName) -> delete_reference(User, Repo, RefName, []).
 delete_reference(User, Repo, RefName, Options) -> exec(octo_reference, delete, [User, Repo, RefName, Options]).
