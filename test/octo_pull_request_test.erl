@@ -58,7 +58,27 @@ update_pull_request_body_test() ->
   {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
   ?assertEqual(UpdatedPullRequest#octo_pull_request.body, <<"Noot">>).
 
+merge_pull_request_test_() ->
+  {
+    timeout, 60, fun () ->
+      {ok, TestHead}      = octo:read_branch("sdepold", "octo.erl-test", "test/head", request_options()),
+      {ok, TestBase}      = octo:read_branch("sdepold", "octo.erl-test", "test/base", request_options()),
+      {ok, TestHeadClone} = octo:create_branch("sdepold", "octo.erl-test", "test/head-clone", sha(TestHead), request_options()),
+      {ok, TestBaseClone} = octo:create_branch("sdepold", "octo.erl-test", "test/base-clone", sha(TestBase), request_options()),
+      {ok, PullRequest}   = create_pull_request(<<"test/head-clone">>, <<"test/base-clone">>),
+      {ok, false}         = octo:is_pull_request_merged("sdepold", "octo.erl-test", PullRequest#octo_pull_request.number, request_options()),
+      {ok, _}             = octo:merge_pull_request("sdepold", "octo.erl-test", PullRequest#octo_pull_request.number, request_options()),
+      {ok, true}          = octo:is_pull_request_merged("sdepold", "octo.erl-test", PullRequest#octo_pull_request.number, request_options()),
+      {ok, _}             = octo:delete_branch("sdepold", "octo.erl-test", "test/head-clone", request_options()),
+      {ok, _}             = octo:delete_branch("sdepold", "octo.erl-test", "test/base-clone", request_options())
+    end
+  }.
+
 %% The test helpers
+
+sha(Branch) ->
+  {{<<"sha">>, Sha}, _, _} = Branch#octo_reference.object,
+  binary_to_list(Sha).
 
 find_test_pull_request_in_list([]) -> null;
 find_test_pull_request_in_list([ PullRequest = #octo_pull_request{ title = <<"Test">> } | _]) -> PullRequest;
@@ -103,9 +123,12 @@ close_pull_request(PullRequest) ->
   update_pull_request(PullRequest, {{<<"state">>, <<"closed">>}}).
 
 create_test_pull_request() ->
+  create_pull_request(<<"test/head">>, <<"test/base">>).
+
+create_pull_request(Head, Base) ->
   octo:create_pull_request("sdepold", "octo.erl-test", {
     {<<"title">>, <<"Amazing new feature">>},
     {<<"body">>, <<"Please pull this in!">>},
-    {<<"head">>, <<"test/head">>},
-    {<<"base">>, <<"test/base">>}
+    {<<"head">>, Head},
+    {<<"base">>, Base}
   }, request_options()).

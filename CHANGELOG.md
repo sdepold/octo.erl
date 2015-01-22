@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## Upcoming
+### Added
+- merge_pull_request
+
 ## [0.5.0] - 2015-01-19
 ### Added
 - update_reference

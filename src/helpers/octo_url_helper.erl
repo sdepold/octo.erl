@@ -1,7 +1,7 @@
 -module(octo_url_helper).
 -export([
   pull_request_url/2, pull_request_url/3, pull_request_commits_url/3,
-  pull_request_files_url/3, pull_request_merged_url/3
+  pull_request_files_url/3, pull_request_merged_url/3, merge_pull_request_url/3
 ]).
 -export([
   reference_url/2, reference_url/3, branch_url/2, branch_url/3, tag_url/2, tag_url/3
@@ -24,6 +24,9 @@ pull_request_files_url(Owner, Repo, Number) ->
 
 pull_request_merged_url(Owner, Repo, Number) ->
   pull_request_url(Owner, Repo, Number) ++ "/merge".
+
+merge_pull_request_url(Owner, Repo, Number) ->
+  pull_request_merged_url(Owner, Repo, Number).
 
 reference_url(Owner, Repo) ->
   repo_url(Owner, Repo) ++ "/git/refs".

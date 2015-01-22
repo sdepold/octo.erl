@@ -9,7 +9,8 @@
   list_pull_request_files/3, list_pull_request_files/4,
   is_pull_request_merged/3, is_pull_request_merged/4,
   create_pull_request/3, create_pull_request/4,
-  update_pull_request/4, update_pull_request/5
+  update_pull_request/4, update_pull_request/5,
+  merge_pull_request/3, merge_pull_request/4
 ]).
 
 -export([
@@ -48,6 +49,9 @@ create_pull_request(User, Repo, Payload, Options) -> exec(octo_pull_request, cre
 
 update_pull_request(User, Repo, Number, Payload) -> update_pull_request(User, Repo, Number, Payload, []).
 update_pull_request(User, Repo, Number, Payload, Options) -> exec(octo_pull_request, update, [User, Repo, Number, Payload, Options]).
+
+merge_pull_request(User, Repo, Number) -> merge_pull_request(User, Repo, Number, []).
+merge_pull_request(User, Repo, Number, Options) -> exec(octo_pull_request, merge, [User, Repo, Number, Options]).
 
 %%% References
 

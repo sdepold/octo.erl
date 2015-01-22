@@ -146,6 +146,14 @@ octo:create_pull_request(Owner, Repo, Payload).
 %%
 %% Returns the updated pull request.
 octo:update_pull_request(Owner, Repo, Number, Payload).
+
+%% Update a pull request.
+%%
+%% Args:
+%% - Owner:  Owner of the repository. Char list.
+%% - Repo:   Name of the repository. Char list.
+%% - Number: The (repo scoped) number of the pull request. Integer.
+octo:merge_pull_request(Owner, Repo, Number).
 ```
 
 #### References
@@ -407,7 +415,7 @@ Options            = [{ all_pages }].
   - [x] List commits on a pull request
   - [x] List pull requests files
   - [x] Get if a pull request has been merged
-  - [ ] Merge a pull request (Merge Button)
+  - [x] Merge a pull request (Merge Button)
 - [ ] Repositories
   - [ ] List your repositories
   - [ ] List user repositories
