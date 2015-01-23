@@ -1,6 +1,6 @@
 {application, octo, [
   {description, "An Erlang octo library"},
-  {vsn, "1"},
+  {vsn, "0.6.0"},
   {modules, [
     octo
   ]},
