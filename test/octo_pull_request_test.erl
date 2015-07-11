@@ -26,37 +26,37 @@ list_pull_request_files_test() ->
 
 is_pull_request_merged_test() ->
   ?assertEqual(
-    octo:is_pull_request_merged("sdepold", "octo.erl", 1, request_options()),
-    {ok, false}
+    {ok, false},
+    octo:is_pull_request_merged("sdepold", "octo.erl", 1, request_options())
   ),
   ?assertEqual(
-    octo:is_pull_request_merged("sdepold", "octo.erl", 2, request_options()),
-    {ok, true}
+    {ok, true},
+    octo:is_pull_request_merged("sdepold", "octo.erl", 2, request_options())
   ).
 
 create_pull_request_test() ->
   {ok, PullRequest}        = create_test_pull_request(),
   {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
-  ?assertEqual(PullRequest#octo_pull_request.title, <<"Amazing new feature">>),
-  ?assertEqual(PullRequest#octo_pull_request.body, <<"Please pull this in!">>).
+  ?assertEqual(<<"Amazing new feature">>,  PullRequest#octo_pull_request.title),
+  ?assertEqual(<<"Please pull this in!">>, PullRequest#octo_pull_request.body).
 
 update_pull_request_state_test() ->
   {ok, PullRequest}        = create_test_pull_request(),
   {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
   {ok, AllPullRequests}    = octo:list_pull_requests("sdepold", "octo.erl-test", request_options()),
-  ?assertEqual(AllPullRequests, []).
+  ?assertEqual([], AllPullRequests).
 
 update_pull_request_title_test() ->
   {ok, PullRequest}        = create_test_pull_request(),
   {ok, UpdatedPullRequest} = update_pull_request(PullRequest, {{<<"title">>, <<"Something else">>}}),
   {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
-  ?assertEqual(UpdatedPullRequest#octo_pull_request.title, <<"Something else">>).
+  ?assertEqual(<<"Something else">>, UpdatedPullRequest#octo_pull_request.title).
 
 update_pull_request_body_test() ->
   {ok, PullRequest}        = create_test_pull_request(),
   {ok, UpdatedPullRequest} = update_pull_request(PullRequest, {{<<"body">>, <<"Noot">>}}),
   {ok, _ClosedPullRequest} = close_pull_request(PullRequest),
-  ?assertEqual(UpdatedPullRequest#octo_pull_request.body, <<"Noot">>).
+  ?assertEqual(<<"Noot">>, UpdatedPullRequest#octo_pull_request.body).
 
 merge_pull_request_test_() ->
   {
@@ -85,27 +85,41 @@ find_test_pull_request_in_list([ PullRequest = #octo_pull_request{ title = <<"Te
 find_test_pull_request_in_list([ _ | Rest ]) -> find_test_pull_request_in_list(Rest).
 
 assert_pull_request(PullRequest) ->
-  ?assertEqual(PullRequest#octo_pull_request.id,         26701040),
-  ?assertEqual(PullRequest#octo_pull_request.number,     1),
-  ?assertEqual(PullRequest#octo_pull_request.html_url,   <<"https://github.com/sdepold/octo.erl/pull/1">>),
-  ?assertEqual(PullRequest#octo_pull_request.title,      <<"Test">>),
-  ?assertEqual(PullRequest#octo_pull_request.state,      <<"open">>),
-  ?assertEqual(PullRequest#octo_pull_request.body,       <<"Do not close this PR as the tests are reading and checking it.">>),
-  ?assertEqual(PullRequest#octo_pull_request.created_at, <<"2014-12-30T20:02:37Z">>),
-  ?assertEqual(PullRequest#octo_pull_request.updated_at, <<"2015-07-31T04:35:33Z">>).
+  ?assertEqual(26701040,                   PullRequest#octo_pull_request.id),
+  ?assertEqual(1,                          PullRequest#octo_pull_request.number),
+  ?assertEqual(<<"Test">>,                 PullRequest#octo_pull_request.title),
+  ?assertEqual(<<"open">>,                 PullRequest#octo_pull_request.state),
+  ?assertEqual(<<"2014-12-30T20:02:37Z">>, PullRequest#octo_pull_request.created_at),
+  ?assertEqual(<<"2015-07-31T04:35:33Z">>, PullRequest#octo_pull_request.updated_at),
+  ?assertEqual(<<"https://github.com/sdepold/octo.erl/pull/1">>,
+      PullRequest#octo_pull_request.html_url),
+  ?assertEqual(<<"Do not close this PR as the tests are reading and checking it.">>,
+      PullRequest#octo_pull_request.body).
 
 assert_commit(Commit) ->
-  ?assertEqual(Commit#octo_commit.html_url, <<"https://github.com/sdepold/octo.erl/commit/b87ca4769260b778c6f4b6e5dadab546f5c89adc">>),
-  ?assertEqual(Commit#octo_commit.sha,      <<"b87ca4769260b778c6f4b6e5dadab546f5c89adc">>).
+  ?assertEqual(
+    <<"https://github.com/sdepold/octo.erl/commit/b87ca4769260b778c6f4b6e5dadab546f5c89adc">>,
+    Commit#octo_commit.html_url
+  ),
+  ?assertEqual(
+    <<"b87ca4769260b778c6f4b6e5dadab546f5c89adc">>,
+    Commit#octo_commit.sha
+  ).
 
 assert_file(File) ->
-  ?assertEqual(File#octo_file.sha,       <<"345e6aef713208c8d50cdea23b85e6ad831f0449">>),
-  ?assertEqual(File#octo_file.filename,  <<"README.md">>),
-  ?assertEqual(File#octo_file.status,    <<"modified">>),
-  ?assertEqual(File#octo_file.additions, 1),
-  ?assertEqual(File#octo_file.deletions, 12),
-  ?assertEqual(File#octo_file.changes,   13),
-  ?assertEqual(File#octo_file.blob_url,  <<"https://github.com/sdepold/octo.erl/blob/b87ca4769260b778c6f4b6e5dadab546f5c89adc/README.md">>).
+  ?assertEqual(<<"README.md">>, File#octo_file.filename),
+  ?assertEqual(<<"modified">>,  File#octo_file.status),
+  ?assertEqual(1,               File#octo_file.additions),
+  ?assertEqual(12,              File#octo_file.deletions),
+  ?assertEqual(13,              File#octo_file.changes),
+  ?assertEqual(
+    <<"345e6aef713208c8d50cdea23b85e6ad831f0449">>,
+    File#octo_file.sha
+  ),
+  ?assertEqual(
+    <<"https://github.com/sdepold/octo.erl/blob/b87ca4769260b778c6f4b6e5dadab546f5c89adc/README.md">>,
+    File#octo_file.blob_url
+  ).
 
 request_options() ->
   AuthToken = os:getenv("AUTH_TOKEN"),
