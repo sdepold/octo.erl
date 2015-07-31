@@ -457,7 +457,7 @@ You can compile the code and run the tests like this:
 ```
 git clone git@github.com:sdepold/octo.erl.git
 cd octo.erl
-rebar get-deps compile
+make deps
 ```
 
 ### Running the tests
@@ -466,5 +466,5 @@ When running the tests you might run into rate limits. You can improve the situa
 an authentication token (PAT) like this:
 
 ```
-AUTH_TOKEN="YOUR_TOKEN" rebar eunit
+AUTH_TOKEN="YOUR_TOKEN" make tests
 ```
