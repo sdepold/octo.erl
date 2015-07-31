@@ -10,7 +10,7 @@ get(Url, Headers) ->
   {status_code_to_tuple_state(StatusCode), Body}.
 
 delete(Url, Headers) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(delete, Url, Headers),
+  {ok, StatusCode, _RespHeaders, _ClientRef} = do_request(delete, Url, Headers),
   {status_code_to_tuple_state(StatusCode), null}.
 
 post(Url, Headers, Payload) ->
