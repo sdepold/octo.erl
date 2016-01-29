@@ -452,7 +452,7 @@ Options            = [{ all_pages }].
 brew install rebar
 ```
 
-You can compile the code and run the tests like this:
+You can compile the code like this:
 
 ```
 git clone git@github.com:sdepold/octo.erl.git
@@ -462,9 +462,21 @@ make deps
 
 ### Running the tests
 
-When running the tests you might run into rate limits. You can improve the situation via providing
-an authentication token (PAT) like this:
+To run tests, you will need to:
 
-```
-AUTH_TOKEN="YOUR_TOKEN" make tests
-```
+1. (Optionally) Create a dedicated login for testing.
+
+   While it's not strictly necessary, separate login minimises the chances of
+   breaking anything important.
+
+2. Clone `sdepold/octo.erl-test` repo (under the testing login).
+
+3. Set `TESTING_LOGIN` environment variable to the login you've created, or to
+   your own if you decided to use it.
+
+4. Generate an authentication token and set `AUTH_TOKEN` environment variable.
+
+5. Now, you can run tests with:
+   ```
+   make tests
+   ```
