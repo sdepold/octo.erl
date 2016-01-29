@@ -462,7 +462,13 @@ make deps
 
 ### Running the tests
 
-To run tests, you will need to:
+Unit tests can be run at any time with the following command:
+
+```
+make tests
+```
+
+Integration tests are a bit more involved:
 
 1. (Optionally) Create a dedicated login for testing.
 
@@ -471,12 +477,13 @@ To run tests, you will need to:
 
 2. Clone `sdepold/octo.erl-test` repo (under the testing login).
 
-3. Set `TESTING_LOGIN` environment variable to the login you've created, or to
-   your own if you decided to use it.
+3. Set `TESTING_LOGIN` environment variable.
 
-4. Generate an authentication token and set `AUTH_TOKEN` environment variable.
+4. Generate an authentication token (for the testing account) and set
+   `AUTH_TOKEN` environment variable. It's sufficient to give it access to your
+   repos, as we don't support anything else at the moment anyway.
 
 5. Now, you can run tests with:
    ```
-   make tests
+   make integration-tests
    ```

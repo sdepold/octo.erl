@@ -1,14 +1,17 @@
-all: deps
+all: app
 
 deps:
 	rebar get-deps
 	rebar compile
 
-app:
+app: deps
 	rebar compile
 
 tests:
 	rebar eunit
+
+integration-tests: app
+	rebar ct
 
 clean:
 	rebar clean
