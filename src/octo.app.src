@@ -4,6 +4,7 @@
   {modules, [
     octo
   ]},
+  {mod, {octo_app, []}},
   {registered, []},
   {applications, [
     kernel,

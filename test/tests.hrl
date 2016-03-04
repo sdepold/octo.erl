@@ -6,8 +6,12 @@
         {inorder,
          {setup,
           fun() ->
+              ok = application:start(octo, transient),
               ok = meck:new(hackney),
               meck:expect(hackney, start, fun() -> ok end)
           end,
-          fun(_) -> ok = meck:unload(hackney) end,
+          fun(_) ->
+              ok = meck:unload(hackney),
+              ok = application:stop(octo)
+          end,
           Tests}}).

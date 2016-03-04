@@ -12,6 +12,8 @@ init_per_suite(_Config) ->
   ct:comment("Remember: if the suite fails, maybe it's because the initial "
              "state of the repo was unclean? If so, just make a fresh clone."),
 
+  application:start(octo),
+
   TestingLogin = os:getenv("TESTING_LOGIN"),
   if TestingLogin =:= false ->
        ct:fail("Please set TESTING_LOGIN environment variable!");
@@ -42,7 +44,8 @@ init_per_suite(_Config) ->
    {login, TestingLogin},
    {repo, Repo}].
 
-end_per_suite(_Config) -> ok.
+end_per_suite(_Config) ->
+  application:stop(octo).
 
 % Tests
 

@@ -21,6 +21,15 @@ rebar get-deps compile
 
 ## Usage
 
+### Application
+
+Even though it's a library, it has a state to keep. Thus, you must start its
+application before calling any of the library's functions:
+
+```erlang
+application:start(octo).
+```
+
 ### Records
 
 This lib ships a couple of record definitions which can be loaded via the `include_lib` directive:
@@ -467,6 +476,10 @@ Unit tests can be run at any time with the following command:
 ```
 make tests
 ```
+
+You'll see a lot of info reports from SASL about `octo` application being
+stopped—don't panic, this is an expected behaviour. Look for a line saying "All
+N tests passed" or check the exit code (should be zero).
 
 Integration tests are a bit more involved:
 
