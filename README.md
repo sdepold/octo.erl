@@ -457,7 +457,7 @@ You can compile the code like this:
 ```
 git clone git@github.com:sdepold/octo.erl.git
 cd octo.erl
-make deps
+make
 ```
 
 ### Running the tests
