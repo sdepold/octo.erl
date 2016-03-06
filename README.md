@@ -388,9 +388,9 @@ Options            = [{ all_pages }].
     - [x] Create a Reference
     - [x] Update a Reference
     - [x] Delete a Reference
-  - [ ] Tags
-    - [ ] Get a Tag
-    - [ ] Create a Tag Object
+  - [x] Tags
+    - [x] Get a Tag
+    - [x] Create a Tag Object
   - [ ] Trees
     - [ ] Get a Tree
     - [ ] Get a Tree Recursively
@@ -407,7 +407,7 @@ Options            = [{ all_pages }].
   - [ ] List user organizations
   - [ ] Get an organization
   - [ ] Edit an organization
-- [ ] Pull Requests
+- [x] Pull Requests
   - [x] List pull requests
   - [x] Get a single pull request
   - [x] Create a pull request
