@@ -1,4 +1,4 @@
-# octo.erl [![Build Status](https://travis-ci.org/sdepold/octo.erl.svg?branch=feature%2Flist-pull-requests)](https://travis-ci.org/sdepold/octo.erl)
+# octo.erl [![Build Status](https://travis-ci.org/sdepold/octo.erl.svg?branch=feature%2Flist-pull-requests)](https://travis-ci.org/sdepold/octo.erl) [![Coverage Status](https://coveralls.io/repos/github/sdepold/octo.erl/badge.svg?branch=code-coverage)](https://coveralls.io/github/sdepold/octo.erl?branch=code-coverage)
 
 The library `octo.erl` is a wrapper for the Github API written in Erlang.
 It focuses on reading data. Write ability might be added later.
