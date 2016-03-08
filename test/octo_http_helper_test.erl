@@ -1,41 +1,33 @@
 -module(octo_http_helper_test).
 -include_lib("eunit/include/eunit.hrl").
 -include("include/octo.hrl").
+-include("test/tests.hrl").
 
 options_to_query_params_test_() ->
-  [?_assertEqual(
-     "",
-     octo_http_helper:options_to_query_params([])
-   ),
-   ?_assertEqual(
-     "per_page=100",
-     octo_http_helper:options_to_query_params([{per_page, 100}])
-   ),
-   ?_assertEqual(
-     "page=2",
-     octo_http_helper:options_to_query_params([{page, 2}])
-   ),
-   ?_assertEqual(
-     "per_page=100&page=2",
-     octo_http_helper:options_to_query_params([{per_page, 100}, {page, 2}])
-   ),
-   ?_assertEqual(
-     "per_page=100&page=2",
-     octo_http_helper:options_to_query_params([{per_page, 100}, hi, {page, 2}])
-   )
-  ].
+  {inparallel,
+   [?_assertEqual(
+      "",
+      octo_http_helper:options_to_query_params([])),
+    ?_assertEqual(
+      "per_page=100",
+      octo_http_helper:options_to_query_params([{per_page, 100}])),
+    ?_assertEqual(
+      "page=2",
+      octo_http_helper:options_to_query_params([{page, 2}])),
+    ?_assertEqual(
+      "per_page=100&page=2",
+      octo_http_helper:options_to_query_params([{per_page, 100}, {page, 2}])),
+    ?_assertEqual(
+      "per_page=100&page=2",
+      octo_http_helper:options_to_query_params([{per_page, 100}, hi, {page, 2}]))
+   ]}.
 
 ternary_fns_test_() ->
   Url = "http://example.com",
   Body = "empty!",
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
       meck:expect(hackney, request,
                   fun(M, U, "", <<>>, "") when M == Method, U =:= Url ->
                       {ok, Status, undef, undef}
@@ -50,19 +42,14 @@ ternary_fns_test_() ->
     end
     ||
     Method <- [post, put, patch],
-    {Status, StatusTerm} <- [{200, ok}, {404, err}]]}.
+    {Status, StatusTerm} <- [{200, ok}, {404, err}]]).
 
 get_test_() ->
   Url = "http://example.com",
   Body = "empty!",
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
       meck:expect(hackney, request,
                   fun(get, U, "", <<>>, "") when U =:= Url ->
                       {ok, Status, undef, undef}
@@ -76,18 +63,13 @@ get_test_() ->
       ?assert(meck:validate(hackney))
     end
     ||
-    {Status, StatusTerm} <- [{200, ok}, {404, err}]]}.
+    {Status, StatusTerm} <- [{200, ok}, {404, err}]]).
 
 delete_test_() ->
   Url = "http://example.com",
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
       meck:expect(hackney, request,
                   fun(delete, U, "", <<>>, "") when U =:= Url ->
                       {ok, Status, undef, undef}
@@ -100,18 +82,13 @@ delete_test_() ->
       ?assert(meck:validate(hackney))
     end
     ||
-    {Status, StatusTerm} <- [{200, ok}, {404, err}]]}.
+    {Status, StatusTerm} <- [{200, ok}, {404, err}]]).
 
 get_response_status_code_test_() ->
   Url = "http://example.com",
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
       meck:expect(hackney, request,
                   fun(get, U, "", <<>>, "") when U =:= Url ->
                       {ok, StatusCode, undef, undef}
@@ -124,7 +101,7 @@ get_response_status_code_test_() ->
       ?assert(meck:validate(hackney))
     end
     ||
-    StatusCode <- [200, 404]]}.
+    StatusCode <- [200, 404]]).
 
 read_collection_test_() ->
   Owner = "testuser",
@@ -132,13 +109,8 @@ read_collection_test_() ->
   PRNumber = 42,
   Options = [],
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, U, "", <<>>, "") when U =:= Url ->
                         {ok, 200, undef, clientref}
@@ -166,4 +138,4 @@ read_collection_test_() ->
      {pull_request_files,
       [Owner, Repo, PRNumber],
       "https://api.github.com/repos/testuser/testrepo/pulls/42/files?"}]
-   ]}.
+   ]).
