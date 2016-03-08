@@ -12,13 +12,8 @@ list_pull_requests_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
                         {ok, 200, undef, clientref}
@@ -33,7 +28,7 @@ list_pull_requests_test_() ->
         ?assertEqual(Expected, Results),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 read_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request.json"),
@@ -42,13 +37,8 @@ read_pull_request_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
                         {ok, 200, undef, clientref}
@@ -63,7 +53,7 @@ read_pull_request_test_() ->
         ?assertEqual(Expected, Results),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 list_pull_request_commits_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_commits.json"),
@@ -72,13 +62,8 @@ list_pull_request_commits_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
                         {ok, 200, undef, clientref}
@@ -95,7 +80,7 @@ list_pull_request_commits_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 list_pull_request_files_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_files.json"),
@@ -104,13 +89,8 @@ list_pull_request_files_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
                         {ok, 200, undef, clientref}
@@ -127,18 +107,11 @@ list_pull_request_files_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 is_pull_request_merged_test_() ->
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) ->
-       ok = meck:unload(hackney)
-   end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
                         {ok, Status, undef, clientref}
@@ -152,7 +125,7 @@ is_pull_request_merged_test_() ->
         ?assert(meck:validate(hackney))
     end
     ||
-    {Status, Expected} <- [{204, true}, {404, false}]]}.
+    {Status, Expected} <- [{204, true}, {404, false}]]).
 
 create_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_create_response.json"),
@@ -161,13 +134,8 @@ create_pull_request_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -184,7 +152,7 @@ create_pull_request_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 update_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_update_response.json"),
@@ -193,13 +161,8 @@ update_pull_request_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(patch, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -217,18 +180,13 @@ update_pull_request_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 merge_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_merge_response.json"),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(put, _Url, "", <<"{}">>, "") ->
                         {ok, 200, undef, clientref}
@@ -243,7 +201,7 @@ merge_pull_request_test_() ->
         ?assertEqual(PRJson, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 %% References
 
@@ -254,13 +212,8 @@ list_references_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -275,7 +228,7 @@ list_references_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 list_branches_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"branches.json"),
@@ -284,13 +237,8 @@ list_branches_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -305,7 +253,7 @@ list_branches_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 list_tags_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"tags.json"),
@@ -314,13 +262,8 @@ list_tags_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -335,7 +278,7 @@ list_tags_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 read_reference_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"reference.json"),
@@ -344,15 +287,8 @@ read_reference_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) ->
-       ok = meck:unload(hackney)
-   end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
                         {ok, StatusCode, undef, clientref}
@@ -373,7 +309,7 @@ read_reference_test_() ->
         ?assert(meck:validate(hackney))
     end
     ||
-    StatusCode <- [200, 404]]}.
+    StatusCode <- [200, 404]]).
 
 read_tag_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"tag.json"),
@@ -382,13 +318,8 @@ read_tag_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -403,7 +334,7 @@ read_tag_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 read_branch_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"branch.json"),
@@ -412,13 +343,8 @@ read_branch_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -433,7 +359,7 @@ read_branch_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 create_reference_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"create_reference_response.json"),
@@ -442,13 +368,8 @@ create_reference_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -465,7 +386,7 @@ create_reference_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 create_branch_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"create_branch_response.json"),
@@ -474,13 +395,8 @@ create_branch_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -498,7 +414,7 @@ create_branch_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 create_tag_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"create_tag_response.json"),
@@ -507,13 +423,8 @@ create_tag_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -531,7 +442,7 @@ create_tag_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 update_reference_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"update_reference_response.json"),
@@ -540,13 +451,8 @@ update_reference_test_() ->
   ?assertEqual(1, length(ExpectedL)),
   Expected = hd(ExpectedL),
 
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) -> ok = meck:unload(hackney) end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(patch, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -564,18 +470,11 @@ update_reference_test_() ->
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]}.
+    end]).
 
 delete_fns_test_() ->
-  {setup,
-   fun() ->
-       ok = meck:new(hackney),
-       meck:expect(hackney, start, fun() -> ok end)
-   end,
-   fun(_) ->
-       ok = meck:unload(hackney)
-   end,
-   [fun() ->
+  ?HACKNEY_MOCK([
+    fun() ->
         meck:expect(hackney, request,
                     fun(delete, _Url, "", _Payload, "") ->
                         {ok, 200, undef, clientref}
@@ -590,4 +489,4 @@ delete_fns_test_() ->
     ||
     {Fun, Name} <- [{delete_reference, "refs/heads/featureA"},
                     {delete_branch, "refs/heads/featureA"},
-                    {delete_tag, "refs/tags/v0.0.1"}]]}.
+                    {delete_tag, "refs/tags/v0.0.1"}]]).
