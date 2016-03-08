@@ -9,24 +9,24 @@
 all() -> [create_and_close].
 
 init_per_suite(_Config) ->
+  ct:comment("Remember: if the suite fails, maybe it's because the initial "
+             "state of the repo was unclean? If so, just make a fresh clone."),
+
   TestingLogin = os:getenv("TESTING_LOGIN"),
-  Repo = "octo.erl-test",
+  if TestingLogin =:= false ->
+       ct:fail("Please set TESTING_LOGIN environment variable!");
+     true -> ok
+  end,
 
   AuthToken = os:getenv("AUTH_TOKEN"),
-  Opts = case AuthToken of
-    false -> [];
-    _     -> [{auth, pat, AuthToken}]
+  if AuthToken =:= false ->
+       ct:fail("Please set AUTH_TOKEN environment variable!");
+     true -> ok
   end,
 
-  % making sure there's no stale test PRs
-  {ok, PRs} = octo_pull_request:list(
-                TestingLogin,
-                Repo,
-                Opts),
-  case find_test_pull_request_in_list(PRs) of
-    null -> ok;
-    ExistingPR -> close_pull_request(ExistingPR, Opts)
-  end,
+  Repo = "octo.erl-test",
+
+  Opts = [{auth, pat, AuthToken}],
 
   [{request_options, Opts},
    {login, TestingLogin},
