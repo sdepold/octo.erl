@@ -3,27 +3,23 @@
 -include("include/octo.hrl").
 
 options_to_query_params_test_() ->
-  [?_assertEqual(
-     "",
-     octo_http_helper:options_to_query_params([])
-   ),
-   ?_assertEqual(
-     "per_page=100",
-     octo_http_helper:options_to_query_params([{per_page, 100}])
-   ),
-   ?_assertEqual(
-     "page=2",
-     octo_http_helper:options_to_query_params([{page, 2}])
-   ),
-   ?_assertEqual(
-     "per_page=100&page=2",
-     octo_http_helper:options_to_query_params([{per_page, 100}, {page, 2}])
-   ),
-   ?_assertEqual(
-     "per_page=100&page=2",
-     octo_http_helper:options_to_query_params([{per_page, 100}, hi, {page, 2}])
-   )
-  ].
+  {inparallel,
+   [?_assertEqual(
+      "",
+      octo_http_helper:options_to_query_params([])),
+    ?_assertEqual(
+      "per_page=100",
+      octo_http_helper:options_to_query_params([{per_page, 100}])),
+    ?_assertEqual(
+      "page=2",
+      octo_http_helper:options_to_query_params([{page, 2}])),
+    ?_assertEqual(
+      "per_page=100&page=2",
+      octo_http_helper:options_to_query_params([{per_page, 100}, {page, 2}])),
+    ?_assertEqual(
+      "per_page=100&page=2",
+      octo_http_helper:options_to_query_params([{per_page, 100}, hi, {page, 2}]))
+   ]}.
 
 ternary_fns_test_() ->
   Url = "http://example.com",
