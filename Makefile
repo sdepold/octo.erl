@@ -6,7 +6,7 @@ deps:
 app: deps
 	rebar compile skip_deps=true
 
-tests:
+tests: app
 	rebar eunit
 
 integration-tests: app
