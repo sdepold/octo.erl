@@ -1,6 +1,6 @@
 [{octo_reference,
   % ref
-  <<"master">>,
+  <<"refs/heads/master">>,
   % url
   <<"https://api.github.com/repos/octocat/Hello-World/git/refs/heads/master">>,
   % object
@@ -10,7 +10,7 @@
 
   {octo_reference,
    % ref
-   <<"gh-pages">>,
+   <<"refs/heads/gh-pages">>,
    % url
    <<"https://api.github.com/repos/octocat/Hello-World/git/refs/heads/gh-pages">>,
    % object

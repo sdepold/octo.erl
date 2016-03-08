@@ -25,18 +25,16 @@ create(Owner, Repo, Payload, Options) ->
   {ok, ?json_to_record(octo_reference, Result)}.
 
 create_branch(Owner, Repo, BranchName, Source, Options) ->
-  {ok, Record} = create(Owner, Repo, {
+  create(Owner, Repo, {
     {<<"ref">>, list_to_binary("refs/heads/" ++ BranchName)},
     {<<"sha">>, list_to_binary(Source)}
-  }, Options),
-  {ok, truncate_ref(Record)}.
+  }, Options).
 
 create_tag(Owner, Repo, TagName, Source, Options) ->
-  {ok, Record} = create(Owner, Repo, {
+  create(Owner, Repo, {
     {<<"ref">>, list_to_binary("refs/tags/" ++ TagName)},
     {<<"sha">>, list_to_binary(Source)}
-  }, Options),
-  {ok, truncate_ref(Record)}.
+  }, Options).
 
 update(Owner, Repo, "refs/" ++ RefName, Payload, Options) ->
   update(Owner, Repo, RefName, Payload, Options);
@@ -62,7 +60,8 @@ delete_tag(Owner, Repo, TagName, Options) ->
 
 list_references(Type, Owner, Repo, Options) ->
   References = octo_http_helper:read_collection(Type, [Owner, Repo], Options),
-  Result     = [ struct_to_record(Reference, Options) || (Reference) <- References ],
+  Result     = [ ?struct_to_record(octo_reference, Reference)
+                 || (Reference) <- References ],
   {ok, Result}.
 
 read_reference(Type, Owner, Repo, "refs/" ++ RefName, Options) ->
@@ -73,18 +72,6 @@ read_reference(Type, Owner, Repo, RefName, Options) ->
   Url           = erlang:apply(octo_url_helper, Fun, [Owner, Repo, RefName]),
   {State, Json} = octo_http_helper:get(Url, Options),
   case State of
-    ok -> {ok, struct_to_record(jsonerl:decode(Json), Options)};
+    ok -> {ok, ?struct_to_record(octo_reference, jsonerl:decode(Json))};
     _  -> {State, Json}
   end.
-
-struct_to_record(Struct, [{ skip_ref_modification }|_]) ->
-  ?struct_to_record(octo_reference, Struct);
-
-struct_to_record(Struct, _) ->
-  Record = ?struct_to_record(octo_reference, Struct),
-  truncate_ref(Record).
-
-truncate_ref(Record) ->
-  OldRef = Record#octo_reference.ref,
-  NewRef = binary:replace(OldRef, [<<"refs/heads/">>, <<"refs/tags/">>], <<"">>),
-  Record#octo_reference{ref=NewRef}.

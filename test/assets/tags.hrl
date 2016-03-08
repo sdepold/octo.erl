@@ -1,6 +1,6 @@
 [{octo_reference,
   % ref
-  <<"v0.0.1">>,
+  <<"refs/tags/v0.0.1">>,
   % url
   <<"https://api.github.com/repos/octocat/Hello-World/git/refs/tags/v0.0.1">>,
   % object
