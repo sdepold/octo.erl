@@ -1,11 +1,10 @@
 all: app
 
 deps:
-	rebar get-deps
-	rebar compile
+	rebar prepare-deps
 
 app: deps
-	rebar compile
+	rebar compile skip_deps=true
 
 tests:
 	rebar eunit
