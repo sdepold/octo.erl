@@ -28,6 +28,16 @@ init_per_suite(_Config) ->
 
   Opts = [{auth, pat, AuthToken}],
 
+  % making sure there's no stale test PRs
+  {ok, PRs} = octo_pull_request:list(
+                TestingLogin,
+                Repo,
+                Opts),
+  case find_test_pull_request_in_list(PRs) of
+    null -> ok;
+    ExistingPR -> close_pull_request(ExistingPR, Opts)
+  end,
+
   [{request_options, Opts},
    {login, TestingLogin},
    {repo, Repo}].
