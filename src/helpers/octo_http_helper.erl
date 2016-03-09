@@ -72,8 +72,7 @@ do_request(Method, Url, OctoOpts, Payload) ->
 
 do_request(Method, Url, OctoOpts, Payload, HackneyOpts) ->
   ParsedHeaders = octo_auth_helper:parse_options(OctoOpts),
-  Res = hackney:request(Method, Url, ParsedHeaders, Payload, HackneyOpts),
-  Res.
+  octo_cache:request(Method, Url, ParsedHeaders, Payload, HackneyOpts).
 
 options_to_query_params([], Query) ->
   Query;
