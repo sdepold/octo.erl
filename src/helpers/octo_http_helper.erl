@@ -7,7 +7,7 @@
 get(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
     do_request(get, Url, OctoOptions),
-  {ok, Body} = hackney:body(ClientRef),
+  {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 delete(Url, OctoOptions) ->
@@ -18,19 +18,19 @@ delete(Url, OctoOptions) ->
 post(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
     do_request(post, Url, OctoOptions, Payload),
-  {ok, Body} = hackney:body(ClientRef),
+  {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 put(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
     do_request(put, Url, OctoOptions, Payload),
-  {ok, Body} = hackney:body(ClientRef),
+  {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 patch(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
     do_request(patch, Url, OctoOptions, Payload),
-  {ok, Body} = hackney:body(ClientRef),
+  {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, OctoOptions) ->

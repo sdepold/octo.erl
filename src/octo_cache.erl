@@ -6,7 +6,7 @@
          handle_call/3, handle_cast/2, handle_info/2,
          code_change/3, terminate/2]).
 
--export([request/5,
+-export([request/5, body/1,
          get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0]).
 
 -record(ratelimit, {limit, remaining, reset}).
@@ -16,6 +16,9 @@
 
 request(Method, Url, Headers, Payload, Options) ->
   gen_server:call(?MODULE, {request, Method, Url, Headers, Payload, Options}).
+
+body(RequestRef) ->
+  gen_server:call(?MODULE, {body, RequestRef}).
 
 get_ratelimit() ->
   gen_server:call(?MODULE, {get_ratelimit}).
@@ -35,18 +38,41 @@ stop() ->
   gen_server:call(?MODULE, stop).
 
 init(_Args) ->
+  ets:new(octo_cache_client_refs, [private, named_table]),
+
   {ok, #cache_state{}}.
 
 handle_call(stop, _From, State) ->
   {stop, normal, ok, State};
 handle_call({request, Method, Url, Headers, Payload, Options}, _From, State) ->
-  {ok, StatusCode, RespHeaders, ClientRef} =
-    hackney:request(Method, Url, Headers, Payload, Options),
+  case hackney:request(Method, Url, Headers, Payload, Options) of
+    {ok, StatusCode, RespHeaders, ClientRef} ->
+      NewState = update_ratelimit(RespHeaders, State),
 
-  NewState = update_ratelimit(State, RespHeaders),
+      RequestRef = make_ref(),
+      %% Asserting that the function returns anything but 'false'. That ensures
+      %% that insert didn't replace anything.
+      true = false =/=
+      ets:insert_new(octo_cache_client_refs, {RequestRef, ClientRef}),
 
-  Result = {ok, StatusCode, RespHeaders, ClientRef},
-  {reply, Result, NewState};
+      Result = {ok, StatusCode, RespHeaders, RequestRef},
+
+      {reply, Result, NewState};
+    Response ->
+      {reply, Response, State}
+  end;
+handle_call({body, RequestRef}, _From, State) ->
+  case ets:lookup(octo_cache_client_refs, RequestRef) of
+    [{RequestRef, ClientRef}] ->
+      Result = hackney:body(ClientRef),
+      case Result of
+        {error, req_not_found} ->
+          ets:delete(octo_cache_client_refs, RequestRef);
+        _ -> ok
+      end,
+      {reply, Result, State};
+    _ -> {reply, {error, octo_cache_no_such_ref}, State}
+  end;
 handle_call({get_ratelimit}, _From, State) ->
   Ratelimit = State#cache_state.ratelimit,
   {reply, Ratelimit#ratelimit.limit, State};
