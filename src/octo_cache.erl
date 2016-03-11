@@ -12,6 +12,9 @@
 -record(ratelimit, {limit, remaining, reset}).
 -record(cache_state, {ratelimit = #ratelimit{}}).
 
+-record(request, {method, url}).
+-record(caching_headers, {etag, last_modified}).
+
 %% Public functions
 
 request(Method, Url, Headers, Payload, Options) ->
@@ -39,13 +42,15 @@ stop() ->
 
 init(_Args) ->
   ets:new(octo_cache_client_refs, [private, named_table]),
+  ets:new(octo_cache_headers,     [private, named_table]),
 
   {ok, #cache_state{}}.
 
 handle_call(stop, _From, State) ->
   {stop, normal, ok, State};
 handle_call({request, Method, Url, Headers, Payload, Options}, _From, State) ->
-  case hackney:request(Method, Url, Headers, Payload, Options) of
+  Headers2 = add_caching_headers(Headers, Method, Url),
+  case hackney:request(Method, Url, Headers2, Payload, Options) of
     {ok, StatusCode, RespHeaders, ClientRef} ->
       NewState = update_ratelimit(RespHeaders, State),
 
@@ -99,7 +104,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Helper functions
 
-update_ratelimit(State, Headers) ->
+update_ratelimit(Headers, State) ->
   Ratelimit = State#cache_state.ratelimit,
 
   Update = fun(FieldNo, HeaderName, RatelimitRecord) ->
@@ -118,3 +123,31 @@ update_ratelimit(State, Headers) ->
                         Ratelimit))),
 
   State#cache_state{ratelimit = NewRatelimit}.
+
+add_caching_headers(Headers, Method, Url) ->
+  Pred = fun({Name, _}) ->
+             (Name =:= <<"ETag">>) orelse (Name =:= <<"Last-Modified">>)
+         end,
+  NotAlreadySet = not lists:any(Pred, Headers),
+  if
+    NotAlreadySet ->
+      Key = #request{method = Method, url = Url},
+      case ets:lookup(octo_cache_headers, Key) of
+        %% Found some values for the headers; let's use them
+        [{Key, Value}] ->
+          Headers2 = case Value#caching_headers.etag of
+                       undefined -> Headers;
+                       ETag -> [{<<"If-None-Match">>, ETag} | Headers]
+                     end,
+          Headers3 = case Value#caching_headers.last_modified of
+                       undefined -> Headers2;
+                       LM -> [{<<"If-Modified-Since">>, LM} | Headers2]
+                     end,
+          Headers3;
+        %% We don't have any headers stored for this request
+        _ -> Headers
+      end;
+    true ->
+      %% At least one of the headers is already set; not touching anything!
+      Headers
+  end.
