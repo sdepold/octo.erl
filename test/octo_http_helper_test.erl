@@ -30,7 +30,7 @@ ternary_fns_test_() ->
     fun() ->
       meck:expect(hackney, request,
                   fun(M, U, "", <<>>, "") when M == Method, U =:= Url ->
-                      {ok, Status, undef, undef}
+                      {ok, Status, [], undef}
                   end),
       meck:expect(hackney, body, fun(undef) -> {ok, Body} end),
 
@@ -52,7 +52,7 @@ get_test_() ->
     fun() ->
       meck:expect(hackney, request,
                   fun(get, U, "", <<>>, "") when U =:= Url ->
-                      {ok, Status, undef, undef}
+                      {ok, Status, [], undef}
                   end),
       meck:expect(hackney, body, fun(undef) -> {ok, Body} end),
 
@@ -72,7 +72,7 @@ delete_test_() ->
     fun() ->
       meck:expect(hackney, request,
                   fun(delete, U, "", <<>>, "") when U =:= Url ->
-                      {ok, Status, undef, undef}
+                      {ok, Status, [], undef}
                   end),
 
       ?assertEqual(
@@ -91,7 +91,7 @@ get_response_status_code_test_() ->
     fun() ->
       meck:expect(hackney, request,
                   fun(get, U, "", <<>>, "") when U =:= Url ->
-                      {ok, StatusCode, undef, undef}
+                      {ok, StatusCode, [], undef}
                   end),
 
       ?assertEqual(
@@ -113,7 +113,7 @@ read_collection_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, U, "", <<>>, "") when U =:= Url ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->

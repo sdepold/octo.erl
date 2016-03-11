@@ -16,7 +16,7 @@ list_pull_requests_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -41,7 +41,7 @@ read_pull_request_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -66,7 +66,7 @@ list_pull_request_commits_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -93,7 +93,7 @@ list_pull_request_files_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -114,7 +114,7 @@ is_pull_request_merged_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", <<>>, "") ->
-                        {ok, Status, undef, clientref}
+                        {ok, Status, [], clientref}
                     end),
 
         {ok, Result} = octo:is_pull_request_merged("octocat",
@@ -138,7 +138,7 @@ create_pull_request_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -165,7 +165,7 @@ update_pull_request_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(patch, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -189,7 +189,7 @@ merge_pull_request_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(put, _Url, "", <<"{}">>, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -216,7 +216,7 @@ list_references_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -241,7 +241,7 @@ list_branches_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -266,7 +266,7 @@ list_tags_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -291,7 +291,7 @@ read_reference_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
-                        {ok, StatusCode, undef, clientref}
+                        {ok, StatusCode, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -322,7 +322,7 @@ read_tag_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -347,7 +347,7 @@ read_branch_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -372,7 +372,7 @@ create_reference_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -399,7 +399,7 @@ create_branch_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -427,7 +427,7 @@ create_tag_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -455,7 +455,7 @@ update_reference_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(patch, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
         meck:expect(hackney, body,
                     fun(clientref) ->
@@ -477,7 +477,7 @@ delete_fns_test_() ->
     fun() ->
         meck:expect(hackney, request,
                     fun(delete, _Url, "", _Payload, "") ->
-                        {ok, 200, undef, clientref}
+                        {ok, 200, [], clientref}
                     end),
 
         ?assertEqual(
