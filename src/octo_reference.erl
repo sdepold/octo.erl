@@ -10,13 +10,47 @@
 
 %% API
 
-list(Owner, Repo, Options) -> list_references(reference, Owner, Repo, Options).
-list_branches(Owner, Repo, Options) -> list_references(branch, Owner, Repo, Options).
-list_tags(Owner, Repo, Options) -> list_references(tag, Owner, Repo, Options).
+list(Owner, Repo, Options) ->
+  CacheKey = {cache_key,
+              #octo_cache_entry_key{
+                function  = list_references,
+                arguments = [Owner, Repo, Options]}},
+  list_references(reference, Owner, Repo, [CacheKey | Options]).
 
-read(Owner, Repo, RefName, Options) -> read_reference(reference, Owner, Repo, RefName, Options).
-read_tag(Owner, Repo, TagName, Options) -> read_reference(tag, Owner, Repo, TagName, Options).
-read_branch(Owner, Repo, BranchName, Options) -> read_reference(branch, Owner, Repo, BranchName, Options).
+list_branches(Owner, Repo, Options) ->
+  CacheKey = {cache_key,
+              #octo_cache_entry_key{
+                function  = list_branches,
+                arguments = [Owner, Repo, Options]}},
+  list_references(branch, Owner, Repo, [CacheKey | Options]).
+
+list_tags(Owner, Repo, Options) ->
+  CacheKey = {cache_key,
+              #octo_cache_entry_key{
+                function  = list_tags,
+                arguments = [Owner, Repo, Options]}},
+  list_references(tag, Owner, Repo, [CacheKey | Options]).
+
+read(Owner, Repo, RefName, Options) ->
+  CacheKey = {cache_key,
+              #octo_cache_entry_key{
+                function  = read_reference,
+                arguments = [Owner, Repo, Options]}},
+  read_reference(reference, Owner, Repo, RefName, [CacheKey | Options]).
+
+read_tag(Owner, Repo, TagName, Options) ->
+  CacheKey = {cache_key,
+              #octo_cache_entry_key{
+                function  = read_tag,
+                arguments = [Owner, Repo, Options]}},
+  read_reference(tag, Owner, Repo, TagName, [CacheKey | Options]).
+
+read_branch(Owner, Repo, BranchName, Options) ->
+  CacheKey = {cache_key,
+              #octo_cache_entry_key{
+                function  = read_branch,
+                arguments = [Owner, Repo, Options]}},
+  read_reference(branch, Owner, Repo, BranchName, [CacheKey | Options]).
 
 create(Owner, Repo, Payload, Options) ->
   Url          = octo_url_helper:reference_url(Owner, Repo),

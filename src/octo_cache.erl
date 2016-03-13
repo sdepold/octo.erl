@@ -81,7 +81,10 @@ handle_call({request, Method, Url, OctoOpts, Payload, Opts}, _From, State) ->
 
       case StatusCode of
         304 ->
-          hackney_response:close(ClientRef),
+          %% We have to skip the body, otherwise Hackney will keep the
+          %% corresponding socket reserved and we'll exhaust the pool
+          %% eventually
+          ok = hackney:skip_body(ClientRef),
           {reply, {ok, cached}, NewState};
         _ ->
           RequestRef = make_ref(),
