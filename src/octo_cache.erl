@@ -1,4 +1,5 @@
 -module(octo_cache).
+-include("octo.hrl").
 -behaviour(gen_server).
 
 -export([start_link/0, stop/0]).
@@ -7,13 +8,11 @@
          code_change/3, terminate/2]).
 
 -export([request/3, request/4, request/5, body/1,
-         get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0]).
+         get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0,
+         store/2, retrieve/1, update/3, insert_or_update/3]).
 
 -record(ratelimit, {limit, remaining, reset}).
 -record(cache_state, {ratelimit = #ratelimit{}}).
-
--record(request, {method, url}).
--record(caching_headers, {etag, last_modified}).
 
 %% Public functions
 
@@ -36,6 +35,21 @@ get_ratelimit_remaining() ->
 get_ratelimit_reset() ->
   gen_server:call(?MODULE, {get_ratelimit_reset}).
 
+store(Key, Value) ->
+  gen_server:call(?MODULE, {store, Key, Value}).
+
+retrieve(Key) ->
+  case ets:lookup(octo_cache_general, Key) of
+    [{Key, Value}] -> {ok, Value};
+    _              -> {error, not_found}
+  end.
+
+update(Key, FieldNo, Value) ->
+  gen_server:call(?MODULE, {update, Key, FieldNo, Value}).
+
+insert_or_update(Key, FieldNo, Value) ->
+  gen_server:call(?MODULE, {insert_or_update, Key, FieldNo, Value}).
+
 %% Callbacks
 
 start_link() ->
@@ -45,20 +59,25 @@ stop() ->
   gen_server:call(?MODULE, stop).
 
 init(_Args) ->
-  ets:new(octo_cache_client_refs, [private, named_table]),
-  ets:new(octo_cache_headers,     [private, named_table]),
+  ets:new(octo_cache_client_refs, [private,   named_table]),
+  ets:new(octo_cache_general,     [protected, named_table]),
 
   {ok, #cache_state{}}.
 
 handle_call(stop, _From, State) ->
   {stop, normal, ok, State};
-handle_call({request, Method, Url, OctoOpts, Payload, Options}, _From, State) ->
-  Headers = octo_auth_helper:parse_options(OctoOpts),
+handle_call({request, Method, Url, OctoOpts, Payload, Opts}, _From, State) ->
+  CacheKey = proplists:get_value(cache_key, OctoOpts),
 
-  Headers2 = add_caching_headers(Headers, Method, Url),
-  case hackney:request(Method, Url, Headers2, Payload, Options) of
+  AuthHeaders = octo_auth_helper:parse_options(OctoOpts),
+  CachingHeaders = get_caching_headers(CacheKey),
+  Headers = AuthHeaders ++ CachingHeaders,
+
+  case hackney:request(Method, Url, Headers, Payload, Opts) of
     {ok, StatusCode, RespHeaders, ClientRef} ->
       NewState = update_ratelimit(RespHeaders, State),
+
+      store_caching_headers(CacheKey, RespHeaders),
 
       RequestRef = make_ref(),
       %% Asserting that the function returns anything but 'false'. That ensures
@@ -93,6 +112,15 @@ handle_call({get_ratelimit_remaining}, _From, State) ->
 handle_call({get_ratelimit_reset}, _From, State) ->
   Ratelimit = State#cache_state.ratelimit,
   {reply, Ratelimit#ratelimit.reset, State};
+handle_call({store, Key, Value}, _From, State) ->
+  ok = dangerous_store(Key, Value),
+  {reply, ok, State};
+handle_call({update, Key, FieldNo, Value}, _From, State) ->
+  Result = dangerous_update(Key, FieldNo, Value),
+  {reply, Result, State};
+handle_call({insert_or_update, Key, FieldNo, Value}, _From, State) ->
+  Result = dangerous_insert_or_update(Key, FieldNo, Value),
+  {reply, Result, State};
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 
@@ -130,30 +158,52 @@ update_ratelimit(Headers, State) ->
 
   State#cache_state{ratelimit = NewRatelimit}.
 
-add_caching_headers(Headers, Method, Url) ->
-  Pred = fun({Name, _}) ->
-             (Name =:= <<"ETag">>) orelse (Name =:= <<"Last-Modified">>)
-         end,
-  NotAlreadySet = not lists:any(Pred, Headers),
-  if
-    NotAlreadySet ->
-      Key = #request{method = Method, url = Url},
-      case ets:lookup(octo_cache_headers, Key) of
-        %% Found some values for the headers; let's use them
-        [{Key, Value}] ->
-          Headers2 = case Value#caching_headers.etag of
-                       undefined -> Headers;
-                       ETag -> [{<<"If-None-Match">>, ETag} | Headers]
-                     end,
-          Headers3 = case Value#caching_headers.last_modified of
-                       undefined -> Headers2;
-                       LM -> [{<<"If-Modified-Since">>, LM} | Headers2]
-                     end,
-          Headers3;
-        %% We don't have any headers stored for this request
-        _ -> Headers
-      end;
-    true ->
-      %% At least one of the headers is already set; not touching anything!
-      Headers
+get_caching_headers(undefined) -> [];
+get_caching_headers(CacheKey) ->
+  case retrieve(CacheKey) of
+    %% Found some values for the headers; let's use them
+    [{ok, Value}] ->
+      Headers  = case Value#octo_cache_headers.etag of
+                   undefined -> [];
+                   ETag -> [{<<"If-None-Match">>, ETag}]
+                 end,
+      Headers2 = case Value#octo_cache_headers.last_modified of
+                   undefined -> Headers;
+                   LM -> [{<<"If-Modified-Since">>, LM} | Headers]
+                 end,
+      Headers2;
+    %% We don't have any headers stored for this request
+    _ -> []
+  end.
+
+store_caching_headers(undefined, _Headers) -> ok;
+store_caching_headers(CacheKey, Headers) ->
+  ETag          = hackney_headers:parse(<<"ETag">>, Headers),
+  Last_Modified = hackney_headers:parse(<<"Last-Modified">>, Headers),
+
+  %% Don't store anything if both values are undefined
+  if (ETag =/= undefined) orelse (Last_Modified =/= undefined) ->
+       ok = dangerous_insert_or_update(
+              CacheKey,
+              #octo_cache_entry.headers,
+              [{<<"ETag">>, ETag}, {<<"Last-Modified">>, Last_Modified}]);
+       true -> ok
+  end.
+
+dangerous_store(Key, Value) ->
+  true = ets:insert(octo_cache_general, {Key, Value}),
+  ok.
+
+dangerous_update(Key, FieldNo, Value) ->
+  case retrieve(Key) of
+    {ok, CachedValue} ->
+      UpdatedValue = setelement(FieldNo, CachedValue, Value),
+      ok = dangerous_store(Key, UpdatedValue);
+    Other -> Other
+  end.
+
+dangerous_insert_or_update(Key, FieldNo, Value) ->
+  case dangerous_update(Key, FieldNo, Value) of
+    ok -> ok;
+    _  -> dangerous_store(Key, setelement(FieldNo, #octo_cache_entry{}, Value))
   end.

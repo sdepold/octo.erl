@@ -1,4 +1,5 @@
 -module(octo_http_helper).
+-include("octo.hrl").
 -export([
   get/2, delete/2, post/3, patch/3, read_collection/3, get_response_status_code/2,
   options_to_query_params/1, put/3
@@ -45,7 +46,12 @@ read_collection(Thing, Args, _Options) ->
   Options    = check_pagination_options(_Options),
   Query      = options_to_query_params(Options),
   FullUrl    = octo_list_helper:join("?", [Url, Query]),
-  {ok, Json} = get(FullUrl, Options),
+
+  CacheKey   = #octo_cache_entry_key{function  = read_collection,
+                                     arguments = Args ++ [Options]},
+
+  {ok, Json} = get(FullUrl,
+                   [proplists:property(cache_key, CacheKey) | Options]),
   Result     = jsonerl:decode(Json),
   case continue_read_collection(Options, Result) of
     true  -> Result ++ read_collection(Thing, Args, increase_page(Options));

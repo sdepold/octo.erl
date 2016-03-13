@@ -3,3 +3,4 @@
 -include("octo_commit.hrl").
 -include("octo_file.hrl").
 -include("octo_reference.hrl").
+-include("octo_cache.hrl").
