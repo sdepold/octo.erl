@@ -6,7 +6,7 @@
          handle_call/3, handle_cast/2, handle_info/2,
          code_change/3, terminate/2]).
 
--export([request/5, body/1,
+-export([request/3, request/4, request/5, body/1,
          get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0]).
 
 -record(ratelimit, {limit, remaining, reset}).
@@ -17,8 +17,12 @@
 
 %% Public functions
 
-request(Method, Url, Headers, Payload, Options) ->
-  gen_server:call(?MODULE, {request, Method, Url, Headers, Payload, Options}).
+request(Method, Url, OctoOpts) ->
+  request(Method, Url, OctoOpts, <<>>).
+request(Method, Url, OctoOpts, Payload) ->
+  request(Method, Url, OctoOpts, Payload, []).
+request(Method, Url, OctoOpts, Payload, Options) ->
+  gen_server:call(?MODULE, {request, Method, Url, OctoOpts, Payload, Options}).
 
 body(RequestRef) ->
   gen_server:call(?MODULE, {body, RequestRef}).
@@ -48,7 +52,9 @@ init(_Args) ->
 
 handle_call(stop, _From, State) ->
   {stop, normal, ok, State};
-handle_call({request, Method, Url, Headers, Payload, Options}, _From, State) ->
+handle_call({request, Method, Url, OctoOpts, Payload, Options}, _From, State) ->
+  Headers = octo_auth_helper:parse_options(OctoOpts),
+
   Headers2 = add_caching_headers(Headers, Method, Url),
   case hackney:request(Method, Url, Headers2, Payload, Options) of
     {ok, StatusCode, RespHeaders, ClientRef} ->

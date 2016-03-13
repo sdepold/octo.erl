@@ -6,36 +6,36 @@
 
 get(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
-    do_request(get, Url, OctoOptions),
+    octo_cache:request(get, Url, OctoOptions),
   {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 delete(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, _ClientRef} =
-    do_request(delete, Url, OctoOptions),
+    octo_cache:request(delete, Url, OctoOptions),
   {status_code_to_tuple_state(StatusCode), null}.
 
 post(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
-    do_request(post, Url, OctoOptions, Payload),
+    octo_cache:request(post, Url, OctoOptions, Payload),
   {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 put(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
-    do_request(put, Url, OctoOptions, Payload),
+    octo_cache:request(put, Url, OctoOptions, Payload),
   {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 patch(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, ClientRef} =
-    do_request(patch, Url, OctoOptions, Payload),
+    octo_cache:request(patch, Url, OctoOptions, Payload),
   {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, _ClientRef} =
-    do_request(get, Url, OctoOptions),
+    octo_cache:request(get, Url, OctoOptions),
   StatusCode.
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
@@ -63,16 +63,6 @@ status_code_to_tuple_state(StatusCode) ->
     2 -> ok;
     _ -> err
   end.
-
-do_request(Method, Url, OctoOpts) ->
-  do_request(Method, Url, OctoOpts, <<>>, []).
-
-do_request(Method, Url, OctoOpts, Payload) ->
-  do_request(Method, Url, OctoOpts, Payload, []).
-
-do_request(Method, Url, OctoOpts, Payload, HackneyOpts) ->
-  ParsedHeaders = octo_auth_helper:parse_options(OctoOpts),
-  octo_cache:request(Method, Url, ParsedHeaders, Payload, HackneyOpts).
 
 options_to_query_params([], Query) ->
   Query;
