@@ -4,32 +4,38 @@
   options_to_query_params/1, put/3
 ]).
 
-get(Url, Headers) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(get, Url, Headers),
+get(Url, OctoOptions) ->
+  {ok, StatusCode, _RespHeaders, ClientRef} =
+    do_request(get, Url, OctoOptions),
   {ok, Body} = hackney:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
-delete(Url, Headers) ->
-  {ok, StatusCode, _RespHeaders, _ClientRef} = do_request(delete, Url, Headers),
+delete(Url, OctoOptions) ->
+  {ok, StatusCode, _RespHeaders, _ClientRef} =
+    do_request(delete, Url, OctoOptions),
   {status_code_to_tuple_state(StatusCode), null}.
 
-post(Url, Headers, Payload) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(post, Url, Headers, Payload),
+post(Url, OctoOptions, Payload) ->
+  {ok, StatusCode, _RespHeaders, ClientRef} =
+    do_request(post, Url, OctoOptions, Payload),
   {ok, Body} = hackney:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
-put(Url, Headers, Payload) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(put, Url, Headers, Payload),
+put(Url, OctoOptions, Payload) ->
+  {ok, StatusCode, _RespHeaders, ClientRef} =
+    do_request(put, Url, OctoOptions, Payload),
   {ok, Body} = hackney:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
-patch(Url, Headers, Payload) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} = do_request(patch, Url, Headers, Payload),
+patch(Url, OctoOptions, Payload) ->
+  {ok, StatusCode, _RespHeaders, ClientRef} =
+    do_request(patch, Url, OctoOptions, Payload),
   {ok, Body} = hackney:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
-get_response_status_code(Url, Headers) ->
-  {ok, StatusCode, _RespHeaders, _ClientRef} = do_request(get, Url, Headers),
+get_response_status_code(Url, OctoOptions) ->
+  {ok, StatusCode, _RespHeaders, _ClientRef} =
+    do_request(get, Url, OctoOptions),
   StatusCode.
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
@@ -58,16 +64,16 @@ status_code_to_tuple_state(StatusCode) ->
     _ -> err
   end.
 
-do_request(Method, Url, Headers) ->
-  do_request(Method, Url, Headers, <<>>, []).
+do_request(Method, Url, OctoOpts) ->
+  do_request(Method, Url, OctoOpts, <<>>, []).
 
-do_request(Method, Url, Headers, Payload) ->
-  do_request(Method, Url, Headers, Payload, []).
+do_request(Method, Url, OctoOpts, Payload) ->
+  do_request(Method, Url, OctoOpts, Payload, []).
 
-do_request(Method, Url, Headers, Payload, Options) ->
+do_request(Method, Url, OctoOpts, Payload, HackneyOpts) ->
   hackney:start(),
-  ParsedHeaders = octo_auth_helper:parse_options(Headers),
-  Res = hackney:request(Method, Url, ParsedHeaders, Payload, Options),
+  ParsedHeaders = octo_auth_helper:parse_options(OctoOpts),
+  Res = hackney:request(Method, Url, ParsedHeaders, Payload, HackneyOpts),
   Res.
 
 options_to_query_params([], Query) ->
