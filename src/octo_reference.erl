@@ -10,11 +10,11 @@
 
 %% API
 
-list(Owner, Repo, Options) -> list_references(reference, Owner, Repo, [{ skip_ref_modification }|Options]).
+list(Owner, Repo, Options) -> list_references(reference, Owner, Repo, Options).
 list_branches(Owner, Repo, Options) -> list_references(branch, Owner, Repo, Options).
 list_tags(Owner, Repo, Options) -> list_references(tag, Owner, Repo, Options).
 
-read(Owner, Repo, RefName, Options) -> read_reference(reference, Owner, Repo, RefName, [{ skip_ref_modification }|Options]).
+read(Owner, Repo, RefName, Options) -> read_reference(reference, Owner, Repo, RefName, Options).
 read_tag(Owner, Repo, TagName, Options) -> read_reference(tag, Owner, Repo, TagName, Options).
 read_branch(Owner, Repo, BranchName, Options) -> read_reference(branch, Owner, Repo, BranchName, Options).
 
