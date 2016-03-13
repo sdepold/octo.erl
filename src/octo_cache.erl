@@ -79,15 +79,21 @@ handle_call({request, Method, Url, OctoOpts, Payload, Opts}, _From, State) ->
 
       store_caching_headers(CacheKey, RespHeaders),
 
-      RequestRef = make_ref(),
-      %% Asserting that the function returns anything but 'false'. That ensures
-      %% that insert didn't replace anything.
-      true = false =/=
-      ets:insert_new(octo_cache_client_refs, {RequestRef, ClientRef}),
+      case StatusCode of
+        304 ->
+          hackney_response:close(ClientRef),
+          {reply, {ok, cached}, NewState};
+        _ ->
+          RequestRef = make_ref(),
+          %% Asserting that the function returns anything but 'false'. That
+          %% ensures that insert didn't replace anything.
+          true = false =/=
+          ets:insert_new(octo_cache_client_refs, {RequestRef, ClientRef}),
 
-      Result = {ok, StatusCode, RespHeaders, RequestRef},
+          Result = {ok, StatusCode, RespHeaders, RequestRef},
 
-      {reply, Result, NewState};
+          {reply, Result, NewState}
+      end;
     Response ->
       {reply, Response, State}
   end;

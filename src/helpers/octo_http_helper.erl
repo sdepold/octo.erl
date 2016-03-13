@@ -6,10 +6,13 @@
 ]).
 
 get(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} =
-    octo_cache:request(get, Url, OctoOptions),
-  {ok, Body} = octo_cache:body(ClientRef),
-  {status_code_to_tuple_state(StatusCode), Body}.
+  if_not_cached(
+    OctoOptions,
+    fun() -> octo_cache:request(get, Url, OctoOptions) end,
+    fun({ok, StatusCode, _RespHeaders, ClientRef}) ->
+        {ok, Body} = octo_cache:body(ClientRef),
+        {status_code_to_tuple_state(StatusCode), Body}
+    end).
 
 delete(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, _ClientRef} =
@@ -35,9 +38,14 @@ patch(Url, OctoOptions, Payload) ->
   {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, _ClientRef} =
-    octo_cache:request(get, Url, OctoOptions),
-  StatusCode.
+  %% This function shouldn't be used with URLs that ever set ETag and/or
+  %% Last-Modified headers, but just in case, let's wrap it in cache lookup
+  if_not_cached(
+    OctoOptions,
+    fun() -> octo_cache:request(get, Url, OctoOptions) end,
+    fun({ok, StatusCode, _RespHeaders, _ClientRef}) ->
+        StatusCode
+    end).
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
 read_collection(Thing, Args, _Options) ->
@@ -102,4 +110,16 @@ check_pagination_options(Options) ->
   case AddPageOption of
     true  -> [{ page, 1 } | Options];
     false -> Options
+  end.
+
+if_not_cached(OctoOptions, Request, ProcessResult) ->
+  CacheKey = proplists:get_value(cache_key, OctoOptions),
+
+  case Request() of
+    {ok, cached} ->
+      {ok, CacheEntry} = octo_cache:retrieve(CacheKey),
+      Result = CacheEntry#octo_cache_entry.result,
+      {ok, Result};
+    Other ->
+      ProcessResult(Other)
   end.
