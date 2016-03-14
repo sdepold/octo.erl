@@ -171,14 +171,15 @@ get_caching_headers(undefined) -> [];
 get_caching_headers(CacheKey) ->
   case retrieve(CacheKey) of
     %% Found some values for the headers; let's use them
-    [{ok, Value}] ->
-      Headers  = case Value#octo_cache_headers.etag of
+    {ok, Value} ->
+      Headers  = Value#octo_cache_entry.headers,
+      Headers1 = case Headers#octo_cache_headers.etag of
                    undefined -> [];
                    ETag -> [{<<"If-None-Match">>, ETag}]
                  end,
-      Headers2 = case Value#octo_cache_headers.last_modified of
-                   undefined -> Headers;
-                   LM -> [{<<"If-Modified-Since">>, LM} | Headers]
+      Headers2 = case Headers#octo_cache_headers.last_modified of
+                   undefined -> Headers1;
+                   LM -> [{<<"If-Modified-Since">>, LM} | Headers1]
                  end,
       Headers2;
     %% We don't have any headers stored for this request
@@ -195,7 +196,7 @@ store_caching_headers(CacheKey, Headers) ->
        ok = dangerous_insert_or_update(
               CacheKey,
               #octo_cache_entry.headers,
-              [{<<"ETag">>, ETag}, {<<"Last-Modified">>, Last_Modified}]);
+              #octo_cache_headers{etag = ETag, last_modified = Last_Modified});
        true -> ok
   end.
 
