@@ -44,7 +44,7 @@ get_response_status_code(Url, OctoOptions) ->
     OctoOptions,
     fun() -> octo_cache:request(get, Url, OctoOptions) end,
     fun({ok, StatusCode, _RespHeaders, _ClientRef}) ->
-        StatusCode
+        {ok, StatusCode}
     end).
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).

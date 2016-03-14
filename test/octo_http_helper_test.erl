@@ -95,7 +95,7 @@ get_response_status_code_test_() ->
                   end),
 
       ?assertEqual(
-         StatusCode,
+         {ok, StatusCode},
          octo_http_helper:get_response_status_code(Url, [])
       ),
       ?assert(meck:validate(hackney))
