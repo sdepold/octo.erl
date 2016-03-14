@@ -9,7 +9,7 @@
 
 -export([request/3, request/4, request/5, body/1,
          get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0,
-         store/2, retrieve/1, update/3, insert_or_update/3]).
+         retrieve/1, update_cache/2]).
 
 -record(ratelimit, {limit, remaining, reset}).
 -record(cache_state, {ratelimit = #ratelimit{}}).
@@ -35,20 +35,14 @@ get_ratelimit_remaining() ->
 get_ratelimit_reset() ->
   gen_server:call(?MODULE, {get_ratelimit_reset}).
 
-store(Key, Value) ->
-  gen_server:call(?MODULE, {store, Key, Value}).
-
 retrieve(Key) ->
   case ets:lookup(octo_cache_general, Key) of
     [{Key, Value}] -> {ok, Value};
     _              -> {error, not_found}
   end.
 
-update(Key, FieldNo, Value) ->
-  gen_server:call(?MODULE, {update, Key, FieldNo, Value}).
-
-insert_or_update(Key, FieldNo, Value) ->
-  gen_server:call(?MODULE, {insert_or_update, Key, FieldNo, Value}).
+update_cache(Key, UpdateFun) ->
+  gen_server:call(?MODULE, {update_cache, Key, UpdateFun}).
 
 %% Callbacks
 
@@ -121,14 +115,8 @@ handle_call({get_ratelimit_remaining}, _From, State) ->
 handle_call({get_ratelimit_reset}, _From, State) ->
   Ratelimit = State#cache_state.ratelimit,
   {reply, Ratelimit#ratelimit.reset, State};
-handle_call({store, Key, Value}, _From, State) ->
-  ok = dangerous_store(Key, Value),
-  {reply, ok, State};
-handle_call({update, Key, FieldNo, Value}, _From, State) ->
-  Result = dangerous_update(Key, FieldNo, Value),
-  {reply, Result, State};
-handle_call({insert_or_update, Key, FieldNo, Value}, _From, State) ->
-  Result = dangerous_insert_or_update(Key, FieldNo, Value),
+handle_call({update_cache, Key, UpdateFun}, _From, State) ->
+  Result = internal_update_cache(Key, UpdateFun),
   {reply, Result, State};
 handle_call(_Request, _From, State) ->
   {noreply, State}.
@@ -193,27 +181,23 @@ store_caching_headers(CacheKey, Headers) ->
 
   %% Don't store anything if both values are undefined
   if (ETag =/= undefined) orelse (Last_Modified =/= undefined) ->
-       ok = dangerous_insert_or_update(
+       ok = internal_update_cache(
               CacheKey,
-              #octo_cache_entry.headers,
-              #octo_cache_headers{etag = ETag, last_modified = Last_Modified});
+              fun(Entry) ->
+                  EntryHeaders = Entry#octo_cache_entry.headers,
+                  Updated = EntryHeaders#octo_cache_headers{
+                              etag          = ETag,
+                              last_modified = Last_Modified},
+                  Entry#octo_cache_entry{headers = Updated}
+              end);
        true -> ok
   end.
 
-dangerous_store(Key, Value) ->
-  true = ets:insert(octo_cache_general, {Key, Value}),
+internal_update_cache(Key, UpdateFun) ->
+  CurrentValue = case retrieve(Key) of
+                   {ok, CachedValue}  -> CachedValue;
+                   {error, not_found} -> #octo_cache_entry{}
+                 end,
+  NewValue = UpdateFun(CurrentValue),
+  true = ets:insert(octo_cache_general, {Key, NewValue}),
   ok.
-
-dangerous_update(Key, FieldNo, Value) ->
-  case retrieve(Key) of
-    {ok, CachedValue} ->
-      UpdatedValue = setelement(FieldNo, CachedValue, Value),
-      ok = dangerous_store(Key, UpdatedValue);
-    Other -> Other
-  end.
-
-dangerous_insert_or_update(Key, FieldNo, Value) ->
-  case dangerous_update(Key, FieldNo, Value) of
-    ok -> ok;
-    _  -> dangerous_store(Key, setelement(FieldNo, #octo_cache_entry{}, Value))
-  end.

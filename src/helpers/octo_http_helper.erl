@@ -124,7 +124,11 @@ if_not_cached(OctoOptions, Request, ProcessResult) ->
       case element(1, Result) of
         ok ->
           %% Looks like processing succeeded; let's cache the result!
-          octo_cache:update(CacheKey, #octo_cache_entry.result, Result),
+          octo_cache:update_cache(
+            CacheKey,
+            fun(Entry) ->
+                Entry#octo_cache_entry{result = Result}
+            end),
           Result;
         _ ->
           Result
