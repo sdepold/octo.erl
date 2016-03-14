@@ -118,8 +118,15 @@ if_not_cached(OctoOptions, Request, ProcessResult) ->
   case Request() of
     {ok, cached} ->
       {ok, CacheEntry} = octo_cache:retrieve(CacheKey),
-      Result = CacheEntry#octo_cache_entry.result,
-      {ok, Result};
+      CacheEntry#octo_cache_entry.result;
     Other ->
-      ProcessResult(Other)
+      Result = ProcessResult(Other),
+      case element(1, Result) of
+        ok ->
+          %% Looks like processing succeeded; let's cache the result!
+          octo_cache:update(CacheKey, #octo_cache_entry.result, Result),
+          Result;
+        _ ->
+          Result
+      end
   end.
