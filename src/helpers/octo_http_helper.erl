@@ -7,16 +7,16 @@
 
 get(Url, OctoOptions) ->
   Options = [{cache_key, Url} | OctoOptions],
-  if_not_cached(
-    Options,
-    fun() -> octo_cache:request(get, Url, Options) end,
-    fun({ok, StatusCode, _RespHeaders, ClientRef}) ->
+
+  case octo_cache:request(get, Url, Options) of
+    {ok, StatusCode, _RespHeaders, ClientRef} ->
         {ok, Body} = octo_cache:body(ClientRef),
         case status_code_to_tuple_state(StatusCode) of
           ok  -> {ok,  Body, Url};
           err -> {err, Body}
-        end
-    end).
+        end;
+    Other -> Other
+  end.
 
 delete(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, _ClientRef} =
@@ -105,27 +105,4 @@ check_pagination_options(Options) ->
   case AddPageOption of
     true  -> [{ page, 1 } | Options];
     false -> Options
-  end.
-
-if_not_cached(OctoOptions, Request, ProcessResult) ->
-  CacheKey = proplists:get_value(cache_key, OctoOptions),
-
-  case Request() of
-    {ok, cached, CacheKey} ->
-      {ok, CacheEntry} = octo_cache:retrieve(CacheKey),
-      CacheEntry#octo_cache_entry.result;
-    Other ->
-      Result = ProcessResult(Other),
-      case element(1, Result) of
-        ok ->
-          %% Looks like processing succeeded; let's cache the result!
-          octo_cache:update_cache(
-            CacheKey,
-            fun(Entry) ->
-                Entry#octo_cache_entry{result = Result}
-            end),
-          Result;
-        _ ->
-          Result
-      end
   end.
