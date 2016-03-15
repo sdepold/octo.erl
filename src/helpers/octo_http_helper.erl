@@ -6,9 +6,10 @@
 ]).
 
 get(Url, OctoOptions) ->
+  Options = [{cache_key, Url} | OctoOptions],
   if_not_cached(
-    OctoOptions,
-    fun() -> octo_cache:request(get, Url, OctoOptions) end,
+    Options,
+    fun() -> octo_cache:request(get, Url, Options) end,
     fun({ok, StatusCode, _RespHeaders, ClientRef}) ->
         {ok, Body} = octo_cache:body(ClientRef),
         {status_code_to_tuple_state(StatusCode), Body}
@@ -55,11 +56,7 @@ read_collection(Thing, Args, _Options) ->
   Query      = options_to_query_params(Options),
   FullUrl    = octo_list_helper:join("?", [Url, Query]),
 
-  CacheKey   = {cache_key,
-                #octo_cache_entry_key{function  = read_collection,
-                                      arguments = Args ++ [Options]}},
-
-  {ok, Json} = get(FullUrl, [CacheKey | Options]),
+  {ok, Json} = get(FullUrl, Options),
   Result     = jsonerl:decode(Json),
   case continue_read_collection(Options, Result) of
     true  -> Result ++ read_collection(Thing, Args, increase_page(Options));

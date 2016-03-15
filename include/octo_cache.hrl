@@ -1,7 +1,3 @@
--record(octo_cache_entry_key, {
-          function  = undefined,
-          arguments = []
-         }).
 -record(octo_cache_headers, {
           etag          = undefined,
           last_modified = undefined}).
