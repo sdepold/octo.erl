@@ -15,12 +15,8 @@ list_pull_requests_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Results} = octo:list_pull_requests("octocat", "Hello-World"),
@@ -40,12 +36,8 @@ read_pull_request_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Results} = octo:read_pull_request("octocat", "Hello-World", 1347),
@@ -65,12 +57,8 @@ list_pull_request_commits_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:list_pull_request_commits("octocat",
@@ -92,12 +80,8 @@ list_pull_request_files_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", <<>>, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:list_pull_request_files("octocat",
@@ -113,8 +97,8 @@ is_pull_request_merged_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(head, _Url, "", <<>>, "") ->
-                        {ok, Status, [], clientref}
+                    fun(head, _Url, "", <<>>, [with_body]) ->
+                        {ok, Status, [], undefined}
                     end),
 
         {ok, Result} = octo:is_pull_request_merged("octocat",
@@ -137,12 +121,8 @@ create_pull_request_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(post, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:create_pull_request("octocat",
@@ -164,12 +144,8 @@ update_pull_request_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(patch, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(patch, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:update_pull_request("octocat",
@@ -188,12 +164,8 @@ merge_pull_request_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(put, _Url, "", <<"{}">>, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(put, _Url, "", <<"{}">>, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:merge_pull_request("octocat", "Hello-World", 1347),
@@ -215,12 +187,8 @@ list_references_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:list_references("octocat", "Hello-World"),
@@ -240,12 +208,8 @@ list_branches_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:list_branches("octocat", "Hello-World"),
@@ -265,12 +229,8 @@ list_tags_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:list_tags("octocat", "Hello-World"),
@@ -290,12 +250,8 @@ read_reference_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", _Payload, "") ->
-                        {ok, StatusCode, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", _Payload, [with_body]) ->
+                        {ok, StatusCode, [], PRJson}
                     end),
 
         {S, Result} = octo:read_reference("octocat",
@@ -321,12 +277,8 @@ read_tag_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:read_tag("octocat", "Hello-World", "v0.0.1"),
@@ -346,12 +298,8 @@ read_branch_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(get, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:read_branch("octocat", "Hello-World", "featureA"),
@@ -371,12 +319,8 @@ create_reference_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(post, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:create_reference("octocat",
@@ -398,12 +342,8 @@ create_branch_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(post, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:create_branch("octocat",
@@ -426,12 +366,8 @@ create_tag_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(post, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(post, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:create_tag("octocat",
@@ -454,12 +390,8 @@ update_reference_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(patch, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, PRJson}
+                    fun(patch, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:update_reference("octocat",
@@ -476,8 +408,8 @@ delete_fns_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(delete, _Url, "", _Payload, "") ->
-                        {ok, 200, [], clientref}
+                    fun(delete, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], undefined}
                     end),
 
         ?assertEqual(

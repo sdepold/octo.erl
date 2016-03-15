@@ -29,10 +29,10 @@ ternary_fns_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
       meck:expect(hackney, request,
-                  fun(M, U, "", <<>>, "") when M == Method, U =:= Url ->
-                      {ok, Status, [], undef}
+                  fun(M, U, "", <<>>, [with_body])
+                      when M == Method, U =:= Url ->
+                      {ok, Status, [], Body}
                   end),
-      meck:expect(hackney, body, fun(undef) -> {ok, Body} end),
 
       ?assertEqual(
          {StatusTerm, Body},
@@ -51,10 +51,9 @@ get_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
       meck:expect(hackney, request,
-                  fun(get, U, "", <<>>, "") when U =:= Url ->
-                      {ok, Status, [], undef}
+                  fun(get, U, "", <<>>, [with_body]) when U =:= Url ->
+                      {ok, Status, [], Body}
                   end),
-      meck:expect(hackney, body, fun(undef) -> {ok, Body} end),
 
       ?assertEqual(
          Result,
@@ -71,7 +70,7 @@ delete_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
       meck:expect(hackney, request,
-                  fun(delete, U, "", <<>>, "") when U =:= Url ->
+                  fun(delete, U, "", <<>>, [with_body]) when U =:= Url ->
                       {ok, Status, [], undef}
                   end),
 
@@ -90,7 +89,7 @@ get_response_status_code_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
       meck:expect(hackney, request,
-                  fun(head, U, "", <<>>, "") when U =:= Url ->
+                  fun(head, U, "", <<>>, [with_body]) when U =:= Url ->
                       {ok, StatusCode, [], undef}
                   end),
 
@@ -112,12 +111,8 @@ read_collection_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, U, "", <<>>, "") when U =:= Url ->
-                        {ok, 200, [], clientref}
-                    end),
-        meck:expect(hackney, body,
-                    fun(clientref) ->
-                        {ok, <<"{\"id\": 1}">>}
+                    fun(get, U, "", <<>>, [with_body]) when U =:= Url ->
+                        {ok, 200, [], <<"{\"id\": 1}">>}
                     end),
 
         ?assertEqual(

@@ -9,8 +9,7 @@ get(Url, OctoOptions) ->
   Options = [{cache_key, Url} | OctoOptions],
 
   case octo_cache:request(get, Url, Options) of
-    {ok, StatusCode, _RespHeaders, ClientRef} ->
-        {ok, Body} = octo_cache:body(ClientRef),
+    {ok, StatusCode, _RespHeaders, Body} ->
         case status_code_to_tuple_state(StatusCode) of
           ok  -> {ok,  Body, Url};
           err -> {err, Body}
@@ -19,30 +18,27 @@ get(Url, OctoOptions) ->
   end.
 
 delete(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, _ClientRef} =
+  {ok, StatusCode, _RespHeaders, _Body} =
     octo_cache:request(delete, Url, OctoOptions),
   {status_code_to_tuple_state(StatusCode), null}.
 
 post(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} =
+  {ok, StatusCode, _RespHeaders, Body} =
     octo_cache:request(post, Url, OctoOptions, Payload),
-  {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 put(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} =
+  {ok, StatusCode, _RespHeaders, Body} =
     octo_cache:request(put, Url, OctoOptions, Payload),
-  {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 patch(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, ClientRef} =
+  {ok, StatusCode, _RespHeaders, Body} =
     octo_cache:request(patch, Url, OctoOptions, Payload),
-  {ok, Body} = octo_cache:body(ClientRef),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, _ClientRef} =
+  {ok, StatusCode, _RespHeaders, _Body} =
     octo_cache:request(head, Url, OctoOptions),
   {ok, StatusCode}.
 
