@@ -11,13 +11,14 @@ list(Owner, Repo, Options) ->
                    pull_request,
                    [Owner, Repo],
                    Options),
-  Result       = [ ?struct_to_record(octo_pull_request, PullRequest) || (PullRequest) <- PullRequests ],
+  Result = [ ?struct_to_record(octo_pull_request, PullRequest)
+             || (PullRequest) <- PullRequests ],
   {ok, Result}.
 
 read(Owner, Repo, Number, Options) ->
-  Url        = octo_url_helper:pull_request_url(Owner, Repo, Number),
-  {ok, Json} = octo_http_helper:get(Url, Options),
-  Result     = ?json_to_record(octo_pull_request, Json),
+  Url = octo_url_helper:pull_request_url(Owner, Repo, Number),
+  {ok, Json, _CacheKey} = octo_http_helper:get(Url, Options),
+  Result = ?json_to_record(octo_pull_request, Json),
   {ok, Result}.
 
 list_commits(Owner, Repo, Number, Options) ->
@@ -25,7 +26,7 @@ list_commits(Owner, Repo, Number, Options) ->
               pull_request_commits,
               [Owner, Repo, Number],
               Options),
-  Result  = [ ?struct_to_record(octo_commit, Commit) || (Commit) <- Commits ],
+  Result = [ ?struct_to_record(octo_commit, Commit) || (Commit) <- Commits ],
   {ok, Result}.
 
 list_files(Owner, Repo, Number, Options) ->

@@ -79,7 +79,7 @@ handle_call({request, Method, Url, OctoOpts, Payload, Opts}, _From, State) ->
           %% corresponding socket reserved and we'll exhaust the pool
           %% eventually
           ok = hackney:skip_body(ClientRef),
-          {reply, {ok, cached}, NewState};
+          {reply, {ok, cached, CacheKey}, NewState};
         _ ->
           RequestRef = make_ref(),
           %% Asserting that the function returns anything but 'false'. That

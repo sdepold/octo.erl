@@ -12,7 +12,10 @@ get(Url, OctoOptions) ->
     fun() -> octo_cache:request(get, Url, Options) end,
     fun({ok, StatusCode, _RespHeaders, ClientRef}) ->
         {ok, Body} = octo_cache:body(ClientRef),
-        {status_code_to_tuple_state(StatusCode), Body}
+        case status_code_to_tuple_state(StatusCode) of
+          ok  -> {ok,  Body, Url};
+          err -> {err, Body}
+        end
     end).
 
 delete(Url, OctoOptions) ->
@@ -56,7 +59,7 @@ read_collection(Thing, Args, _Options) ->
   Query      = options_to_query_params(Options),
   FullUrl    = octo_list_helper:join("?", [Url, Query]),
 
-  {ok, Json} = get(FullUrl, Options),
+  {ok, Json, _CacheKey} = get(FullUrl, Options),
   Result     = jsonerl:decode(Json),
   case continue_read_collection(Options, Result) of
     true  -> Result ++ read_collection(Thing, Args, increase_page(Options));
@@ -113,7 +116,7 @@ if_not_cached(OctoOptions, Request, ProcessResult) ->
   CacheKey = proplists:get_value(cache_key, OctoOptions),
 
   case Request() of
-    {ok, cached} ->
+    {ok, cached, CacheKey} ->
       {ok, CacheEntry} = octo_cache:retrieve(CacheKey),
       CacheEntry#octo_cache_entry.result;
     Other ->

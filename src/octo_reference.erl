@@ -78,10 +78,10 @@ read_reference(Type, Owner, Repo, "refs/" ++ RefName, Options) ->
   read_reference(Type, Owner, Repo, RefName, Options);
 
 read_reference(Type, Owner, Repo, RefName, Options) ->
-  Fun           = list_to_atom(atom_to_list(Type) ++ "_url"),
-  Url           = erlang:apply(octo_url_helper, Fun, [Owner, Repo, RefName]),
-  {State, Json} = octo_http_helper:get(Url, Options),
-  case State of
-    ok -> {ok, ?struct_to_record(octo_reference, jsonerl:decode(Json))};
-    _  -> {State, Json}
+  Fun = list_to_atom(atom_to_list(Type) ++ "_url"),
+  Url = erlang:apply(octo_url_helper, Fun, [Owner, Repo, RefName]),
+  case octo_http_helper:get(Url, Options) of
+    {ok, Json, _CacheKey} ->
+      {ok, ?struct_to_record(octo_reference, jsonerl:decode(Json))};
+    {err, Json} -> {err, Json}
   end.

@@ -57,13 +57,13 @@ get_test_() ->
       meck:expect(hackney, body, fun(undef) -> {ok, Body} end),
 
       ?assertEqual(
-         {StatusTerm, Body},
+         Result,
          octo_http_helper:get(Url, [])
       ),
       ?assert(meck:validate(hackney))
     end
     ||
-    {Status, StatusTerm} <- [{200, ok}, {404, err}]]).
+    {Status, Result} <- [{200, {ok, Body, Url}}, {404, {err, Body}}]]).
 
 delete_test_() ->
   Url = "http://example.com",
