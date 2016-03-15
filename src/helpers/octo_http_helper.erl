@@ -44,14 +44,28 @@ get_response_status_code(Url, OctoOptions) ->
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
 read_collection(Thing, Args, _Options) ->
-  Fun        = list_to_atom(atom_to_list(Thing) ++ "_url"),
-  Url        = erlang:apply(octo_url_helper, Fun, Args),
-  Options    = check_pagination_options(_Options),
-  Query      = options_to_query_params(Options),
-  FullUrl    = octo_list_helper:join("?", [Url, Query]),
+  Fun     = list_to_atom(atom_to_list(Thing) ++ "_url"),
+  Url     = erlang:apply(octo_url_helper, Fun, Args),
+  Options = check_pagination_options(_Options),
+  Query   = options_to_query_params(Options),
+  FullUrl = octo_list_helper:join("?", [Url, Query]),
 
-  {ok, Json, _CacheKey} = get(FullUrl, Options),
-  Result     = jsonerl:decode(Json),
+  Result = case get(FullUrl, Options) of
+             {ok, cached, CacheKey} ->
+               octo_cache:retrieve(CacheKey);
+             {ok, Json, CacheKey} ->
+               Processed = jsonerl:decode(Json),
+
+               octo_cache:update_cache(
+                 CacheKey,
+                 fun(Entry) ->
+                     setelement(#octo_cache_entry.result, Entry, Processed)
+                 end),
+
+               Processed;
+             Other -> Other
+           end,
+
   case continue_read_collection(Options, Result) of
     true  -> Result ++ read_collection(Thing, Args, increase_page(Options));
     false -> Result

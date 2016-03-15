@@ -17,8 +17,18 @@ list(Owner, Repo, Options) ->
 
 read(Owner, Repo, Number, Options) ->
   Url = octo_url_helper:pull_request_url(Owner, Repo, Number),
-  {ok, Json, _CacheKey} = octo_http_helper:get(Url, Options),
-  Result = ?json_to_record(octo_pull_request, Json),
+  Result = case octo_http_helper:get(Url, Options) of
+             {ok, cached, CacheKey} -> octo_cache:retrieve(CacheKey);
+             {ok, Json, CacheKey} ->
+               Processed = ?json_to_record(octo_pull_request, Json),
+               octo_cache:update_cache(
+                 CacheKey,
+                 fun(Entry) ->
+                     setelement(#octo_cache_entry.result, Entry, Processed)
+                 end),
+               Processed;
+             Other -> Other
+           end,
   {ok, Result}.
 
 list_commits(Owner, Repo, Number, Options) ->
