@@ -113,7 +113,7 @@ is_pull_request_merged_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(get, _Url, "", <<>>, "") ->
+                    fun(head, _Url, "", <<>>, "") ->
                         {ok, Status, [], clientref}
                     end),
 

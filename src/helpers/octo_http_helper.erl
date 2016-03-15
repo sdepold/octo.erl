@@ -42,14 +42,9 @@ patch(Url, OctoOptions, Payload) ->
   {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, OctoOptions) ->
-  %% This function shouldn't be used with URLs that ever set ETag and/or
-  %% Last-Modified headers, but just in case, let's wrap it in cache lookup
-  if_not_cached(
-    OctoOptions,
-    fun() -> octo_cache:request(get, Url, OctoOptions) end,
-    fun({ok, StatusCode, _RespHeaders, _ClientRef}) ->
-        {ok, StatusCode}
-    end).
+  {ok, StatusCode, _RespHeaders, _ClientRef} =
+    octo_cache:request(head, Url, OctoOptions),
+  {ok, StatusCode}.
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
 read_collection(Thing, Args, _Options) ->

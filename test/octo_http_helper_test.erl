@@ -90,7 +90,7 @@ get_response_status_code_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
       meck:expect(hackney, request,
-                  fun(get, U, "", <<>>, "") when U =:= Url ->
+                  fun(head, U, "", <<>>, "") when U =:= Url ->
                       {ok, StatusCode, [], undef}
                   end),
 
