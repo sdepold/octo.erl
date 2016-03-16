@@ -8,7 +8,7 @@
 get(Url, OctoOptions) ->
   Options = [{cache_key, Url} | OctoOptions],
 
-  case octo_cache:request(get, Url, Options) of
+  case octo_http_proxy:request(get, Url, Options) of
     {ok, StatusCode, _RespHeaders, Body} ->
         case status_code_to_tuple_state(StatusCode) of
           ok  -> {ok,  Body, Url};
@@ -19,27 +19,27 @@ get(Url, OctoOptions) ->
 
 delete(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, _Body} =
-    octo_cache:request(delete, Url, OctoOptions),
+    octo_http_proxy:request(delete, Url, OctoOptions),
   {status_code_to_tuple_state(StatusCode), null}.
 
 post(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, Body} =
-    octo_cache:request(post, Url, OctoOptions, Payload),
+    octo_http_proxy:request(post, Url, OctoOptions, Payload),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 put(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, Body} =
-    octo_cache:request(put, Url, OctoOptions, Payload),
+    octo_http_proxy:request(put, Url, OctoOptions, Payload),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 patch(Url, OctoOptions, Payload) ->
   {ok, StatusCode, _RespHeaders, Body} =
-    octo_cache:request(patch, Url, OctoOptions, Payload),
+    octo_http_proxy:request(patch, Url, OctoOptions, Payload),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, OctoOptions) ->
   {ok, StatusCode, _RespHeaders, _Body} =
-    octo_cache:request(head, Url, OctoOptions),
+    octo_http_proxy:request(head, Url, OctoOptions),
   {ok, StatusCode}.
 
 %% Usage: read_collection(pull_request, [Owner, Repo], Options).
