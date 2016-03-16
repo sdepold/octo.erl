@@ -364,9 +364,11 @@ If you don't want to do the pagination manually, you can also provide an option 
 pages automatically:
 
 ```erlang
-Options            = [{ all_pages }].
+Options            = [all_pages].
 {ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
+
+(`Options` is a `proplist`, so `[{all_pages, true}]` will work as well.)
 
 ## Implementation state
 
