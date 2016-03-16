@@ -19,13 +19,11 @@ read(Owner, Repo, Number, Options) ->
   Url = octo_url_helper:pull_request_url(Owner, Repo, Number),
   Result = case octo_http_helper:get(Url, Options) of
              {ok, cached, CacheKey} -> octo_cache:retrieve(CacheKey);
-             {ok, Json, CacheKey} ->
+             {ok, Json, CacheKey, CacheEntry} ->
                Processed = ?json_to_record(octo_pull_request, Json),
-               octo_cache:update_cache(
+               octo_cache:store(
                  CacheKey,
-                 fun(Entry) ->
-                     setelement(#octo_cache_entry.result, Entry, Processed)
-                 end),
+                 CacheEntry#octo_cache_entry{result = Processed}),
                Processed;
              Other -> Other
            end,

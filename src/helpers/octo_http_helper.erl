@@ -9,36 +9,36 @@ get(Url, OctoOptions) ->
   Options = [{cache_key, Url} | OctoOptions],
 
   case octo_http_proxy:request(get, Url, Options) of
-    {ok, StatusCode, _RespHeaders, Body} ->
+    {ok, StatusCode, _RespHeaders, Body, CacheKey, CacheEntry} ->
         case status_code_to_tuple_state(StatusCode) of
-          ok  -> {ok,  Body, Url};
+          ok  -> {ok,  Body, CacheKey, CacheEntry};
           err -> {err, Body}
         end;
     Other -> Other
   end.
 
 delete(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, _Body} =
+  {ok, StatusCode, _RespHeaders, _Body, _CacheKey, _CacheEntry} =
     octo_http_proxy:request(delete, Url, OctoOptions),
   {status_code_to_tuple_state(StatusCode), null}.
 
 post(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, Body} =
+  {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} =
     octo_http_proxy:request(post, Url, OctoOptions, Payload),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 put(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, Body} =
+  {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} =
     octo_http_proxy:request(put, Url, OctoOptions, Payload),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 patch(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, Body} =
+  {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} =
     octo_http_proxy:request(patch, Url, OctoOptions, Payload),
   {status_code_to_tuple_state(StatusCode), Body}.
 
 get_response_status_code(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, _Body} =
+  {ok, StatusCode, _RespHeaders, _Body, _CacheKey, _CacheEntry} =
     octo_http_proxy:request(head, Url, OctoOptions),
   {ok, StatusCode}.
 
@@ -53,14 +53,12 @@ read_collection(Thing, Args, _Options) ->
   Result = case get(FullUrl, Options) of
              {ok, cached, CacheKey} ->
                octo_cache:retrieve(CacheKey);
-             {ok, Json, CacheKey} ->
+             {ok, Json, CacheKey, CacheEntry} ->
                Processed = jsonerl:decode(Json),
 
-               octo_cache:update_cache(
+               octo_cache:store(
                  CacheKey,
-                 fun(Entry) ->
-                     setelement(#octo_cache_entry.result, Entry, Processed)
-                 end),
+                 CacheEntry#octo_cache_entry{result = Processed}),
 
                Processed;
              Other -> Other

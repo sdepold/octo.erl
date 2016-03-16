@@ -62,7 +62,8 @@ get_test_() ->
       ?assert(meck:validate(hackney))
     end
     ||
-    {Status, Result} <- [{200, {ok, Body, Url}}, {404, {err, Body}}]]).
+    {Status, Result} <- [{200, {ok, Body, Url, #octo_cache_entry{}}},
+                         {404, {err, Body}}]]).
 
 delete_test_() ->
   Url = "http://example.com",

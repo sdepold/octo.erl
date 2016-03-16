@@ -55,14 +55,13 @@ handle_call({request, Method, Url, OctoOpts, Payload, Opts}, _From, State) ->
     {ok, StatusCode, RespHeaders, Body} ->
       NewState = update_ratelimit(RespHeaders, State),
 
-      store_caching_headers(CacheKey, RespHeaders),
-      store_link_header(CacheKey, RespHeaders),
+      CacheEntry = extract_headers(RespHeaders),
 
       case StatusCode of
         304 ->
           {reply, {ok, cached, CacheKey}, NewState};
         _ ->
-          Result = {ok, StatusCode, RespHeaders, Body},
+          Result = {ok, StatusCode, RespHeaders, Body, CacheKey, CacheEntry},
 
           {reply, Result, NewState}
       end;
@@ -143,47 +142,28 @@ get_caching_headers(CacheKey) ->
     _ -> []
   end.
 
-store_caching_headers(undefined, _Headers) -> ok;
-store_caching_headers(CacheKey, Headers) ->
+extract_headers(Headers) ->
   ETag          = hackney_headers:parse(<<"ETag">>, Headers),
   Last_Modified = hackney_headers:parse(<<"Last-Modified">>, Headers),
 
-  %% Don't store anything if both values are undefined
-  if (ETag =/= undefined) orelse (Last_Modified =/= undefined) ->
-       ok = octo_cache:update_cache(
-              CacheKey,
-              fun(Entry) ->
-                  EntryHeaders = Entry#octo_cache_entry.headers,
-                  Updated = EntryHeaders#octo_cache_headers{
-                              etag          = ETag,
-                              last_modified = Last_Modified},
-                  Entry#octo_cache_entry{headers = Updated}
-              end);
-       true -> ok
-  end.
+  LinkValue = hackney_headers:parse(<<"Link">>, Headers),
+  Link = if LinkValue =/= undefined ->
+              %% Turn the value into proplist with keys "next", "prev", "first
+              %% and "last"
+              lists:map(
+                fun(String) ->
+                    [URL, Rel] = string:tokens(String, ";"),
+                    {match, [Key|_]} = re:run(Rel,
+                                              "^ rel=\"\(.*\)\"$",
+                                              [{capture, [1], list}]),
+                    {list_to_atom(Key), URL}
+                end,
+                string:tokens(binary:bin_to_list(LinkValue), ","));
+            true -> []
+         end,
 
-store_link_header(undefined, _Headers) -> ok;
-store_link_header(CacheKey, Headers) ->
-  Link = hackney_headers:parse(<<"Link">>, Headers),
-
-  if Link =/= undefined ->
-       %% Turn the value into proplist with keys "next", "prev", "first and
-       %% "last"
-       Value = lists:map(
-                 fun(String) ->
-                     [URL, Rel] = string:tokens(String, ";"),
-                     {match, [Key|_]} = re:run(Rel,
-                                               "^ rel=\"\(.*\)\"$",
-                                               [{capture, [1], list}]),
-                     {list_to_atom(Key), URL}
-                 end,
-                 string:tokens(binary:bin_to_list(Link), ",")),
-       ok = octo_cache:update_cache(
-              CacheKey,
-              fun(Entry) ->
-                  EntryHeaders = Entry#octo_cache_entry.headers,
-                  Updated = EntryHeaders#octo_cache_headers{link = Value},
-                  Entry#octo_cache_entry{headers = Updated}
-              end);
-       true -> ok
-  end.
+  #octo_cache_entry{
+    headers = #octo_cache_headers{
+                 etag = ETag,
+                 last_modified = Last_Modified,
+                 link = Link}}.

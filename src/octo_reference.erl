@@ -82,11 +82,11 @@ read_reference(Type, Owner, Repo, RefName, Options) ->
   Url = erlang:apply(octo_url_helper, Fun, [Owner, Repo, RefName]),
   case octo_http_helper:get(Url, Options) of
     {ok, cached, CacheKey} -> octo_cache:retrieve(CacheKey);
-    {ok, Json, CacheKey} ->
+    {ok, Json, CacheKey, CacheEntry} ->
       Result = ?struct_to_record(octo_reference, jsonerl:decode(Json)),
-      octo_cache:update_cache(
+      octo_cache:store(
         CacheKey,
-        fun(Entry) -> setelement(#octo_cache_entry.result, Entry, Result) end),
+        CacheEntry#octo_cache_entry{result = Result}),
       {ok, Result};
     Other -> Other
   end.
