@@ -125,7 +125,7 @@ update_ratelimit(Headers, State) ->
 
 get_caching_headers(undefined) -> [];
 get_caching_headers(CacheKey) ->
-  case octo_cache:retrieve(CacheKey) of
+  case octo_cache:retrieve({url, CacheKey}) of
     %% Found some values for the headers; let's use them
     {ok, Value} ->
       Headers  = Value#octo_cache_entry.headers,

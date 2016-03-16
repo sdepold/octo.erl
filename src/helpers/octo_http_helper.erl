@@ -52,7 +52,7 @@ read_collection(Thing, Args, _Options) ->
 
   Result = case get(FullUrl, Options) of
              {ok, cached, CacheKey} ->
-               octo_cache:retrieve(CacheKey);
+               octo_cache:retrieve({url, CacheKey});
              {ok, Json, CacheKey, CacheEntry} ->
                Processed = jsonerl:decode(Json),
 

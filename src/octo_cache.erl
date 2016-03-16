@@ -9,13 +9,14 @@
 
 -export([retrieve/1, store/2]).
 
+-record(state, {by_url = dict:new(), by_result = dict:new()}).
+
 %% Public functions
 
-retrieve(Key) ->
-  case ets:lookup(octo_cache_general, Key) of
-    [{Key, Value}] -> {ok, Value};
-    _              -> {error, not_found}
-  end.
+retrieve({url, Key}) ->
+  gen_server:call(?MODULE, {retrieve, {url, Key}});
+retrieve({result, Key}) ->
+  gen_server:call(?MODULE, {retrieve, {result, Key}}).
 
 store(Key, Value) ->
   gen_server:call(?MODULE, {store, Key, Value}).
@@ -29,15 +30,29 @@ stop() ->
   gen_server:call(?MODULE, stop).
 
 init(_Args) ->
-  ets:new(octo_cache_general, [protected, named_table]),
-
-  {ok, undefined}.
+  {ok, #state{}}.
 
 handle_call(stop, _From, State) ->
   {stop, normal, ok, State};
+handle_call({retrieve, {url, Key}}, _From, State) ->
+  case dict:find(Key, State#state.by_url) of
+    error -> {reply, {error, not_found}, State};
+    {ok, Value} -> {reply, {ok, Value}, State}
+  end;
+handle_call({retrieve, {result, Key}}, _From, State) ->
+  case dict:find(Key, State#state.by_result) of
+    error -> {reply, {error, not_found}, State};
+    {ok, Value} -> {reply, {ok, Value}, State}
+  end;
 handle_call({store, Key, Value}, _From, State) ->
-  true = ets:insert(octo_cache_general, {Key, Value}),
-  {reply, ok, State};
+  Result = Value#octo_cache_entry.result,
+
+  ByUrl    = dict:store(Key,    Value, State#state.by_url),
+  ByResult = dict:store(Result, Value, State#state.by_result),
+
+  NewState = State#state{by_url = ByUrl, by_result = ByResult},
+
+  {reply, ok, NewState};
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 
