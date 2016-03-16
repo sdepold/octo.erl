@@ -354,7 +354,7 @@ Every function that returns a list is paginated. By default that are a 30 entrie
 You can configure the pagination like this:
 
 ```erlang
-Options            = [{ page, 1 }, { per_page, 100 }].
+Options            = [{ per_page, 100 }].
 {ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
 

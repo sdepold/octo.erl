@@ -85,8 +85,6 @@ options_to_query_params([], Query) ->
   Query;
 options_to_query_params([{ per_page, PerPage }|Rest], Query) ->
   options_to_query_params(Rest, Query ++ ["per_page=" ++ integer_to_list(PerPage)]);
-options_to_query_params([{ page, Page }|Rest], Query) ->
-  options_to_query_params(Rest, Query ++ ["page=" ++ integer_to_list(Page)]);
 options_to_query_params([_|Rest], Query) ->
   options_to_query_params(Rest, Query).
 
