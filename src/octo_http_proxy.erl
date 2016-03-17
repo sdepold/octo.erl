@@ -152,10 +152,11 @@ extract_headers(Headers) ->
               %% and "last"
               lists:map(
                 fun(String) ->
-                    [URL, Rel] = string:tokens(String, ";"),
-                    {match, [Key|_]} = re:run(Rel,
-                                              "^ rel=\"\(.*\)\"$",
-                                              [{capture, [1], list}]),
+                    {match, [URL,Key]} =
+                      re:run(
+                        String,
+                        "^ ?<\([^>]+\)>; rel=\"\([^\"]+\)\"$",
+                        [{capture, [1,2], list}]),
                     {list_to_atom(Key), URL}
                 end,
                 string:tokens(binary:bin_to_list(LinkValue), ","));
