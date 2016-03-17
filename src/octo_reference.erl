@@ -1,8 +1,12 @@
 -module(octo_reference).
 -include("octo.hrl").
 -export([
-  list/3, list_branches/3, list_tags/3,
-  read/4, read_tag/4, read_branch/4,
+  list/2, list/3,
+  list_branches/2, list_branches/3,
+  list_tags/2, list_tags/3,
+  read/4,
+  read_tag/4,
+  read_branch/4,
   create/4, create_branch/5, create_tag/5,
   update/5,
   delete/4, delete_branch/4, delete_tag/4
@@ -10,14 +14,29 @@
 
 %% API
 
+list(Arg, Options) ->
+  octo_pagination_helper:read_collection(Arg,
+                                         Options,
+                                         fun process_references/1).
 list(Owner, Repo, Options) ->
-  list_references(reference, Owner, Repo, Options).
+  Url = octo_url_helper:generate_url(reference, [Owner, Repo], Options),
+  octo_http_helper:read_collection(Url, Options, fun process_references/1).
 
+list_branches(Arg, Options) ->
+  octo_pagination_helper:read_collection(Arg,
+                                         Options,
+                                         fun process_references/1).
 list_branches(Owner, Repo, Options) ->
-  list_references(branch, Owner, Repo, Options).
+  Url = octo_url_helper:generate_url(branch, [Owner, Repo], Options),
+  octo_http_helper:read_collection(Url, Options, fun process_references/1).
 
+list_tags(Arg, Options) ->
+  octo_pagination_helper:read_collection(Arg,
+                                         Options,
+                                         fun process_references/1).
 list_tags(Owner, Repo, Options) ->
-  list_references(tag, Owner, Repo, Options).
+  Url = octo_url_helper:generate_url(tag, [Owner, Repo], Options),
+  octo_http_helper:read_collection(Url, Options, fun process_references/1).
 
 read(Owner, Repo, RefName, Options) ->
   read_reference(reference, Owner, Repo, RefName, Options).
@@ -68,18 +87,18 @@ delete_tag(Owner, Repo, TagName, Options) ->
 
 %% Internals
 
-list_references(Type, Owner, Repo, Options) ->
-  References = octo_http_helper:read_collection(Type, [Owner, Repo], Options),
-  Result     = [ ?struct_to_record(octo_reference, Reference)
-                 || (Reference) <- References ],
-  {ok, Result}.
+process_references(References) ->
+  [ ?struct_to_record(octo_reference, Reference)
+             || (Reference) <- References ].
 
 read_reference(Type, Owner, Repo, "refs/" ++ RefName, Options) ->
   read_reference(Type, Owner, Repo, RefName, Options);
-
 read_reference(Type, Owner, Repo, RefName, Options) ->
   Fun = list_to_atom(atom_to_list(Type) ++ "_url"),
   Url = erlang:apply(octo_url_helper, Fun, [Owner, Repo, RefName]),
+  read_reference(Url, Options).
+
+read_reference(Url, Options) ->
   case octo_http_helper:get(Url, Options) of
     {ok, cached, CacheKey} -> octo_cache:retrieve({url, CacheKey});
     {ok, Json, CacheKey, CacheEntry} ->

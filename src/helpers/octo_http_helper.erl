@@ -1,8 +1,8 @@
 -module(octo_http_helper).
 -include("octo.hrl").
 -export([
-  get/2, delete/2, post/3, patch/3, read_collection/3, get_response_status_code/2,
-  options_to_query_params/1, put/3
+  get/2, delete/2, post/3, patch/3, put/3, get_response_status_code/2,
+  read_collection/3
 ]).
 
 get(Url, OctoOptions) ->
@@ -42,36 +42,8 @@ get_response_status_code(Url, OctoOptions) ->
     octo_http_proxy:request(head, Url, OctoOptions),
   {ok, StatusCode}.
 
-%% Usage: read_collection(pull_request, [Owner, Repo], Options).
-read_collection(Thing, Args, _Options) ->
-  Fun     = list_to_atom(atom_to_list(Thing) ++ "_url"),
-  Url     = erlang:apply(octo_url_helper, Fun, Args),
-  Options = check_pagination_options(_Options),
-  Query   = options_to_query_params(Options),
-  FullUrl = octo_list_helper:join("?", [Url, Query]),
-
-  Result = case get(FullUrl, Options) of
-             {ok, cached, CacheKey} ->
-               octo_cache:retrieve({url, CacheKey});
-             {ok, Json, CacheKey, CacheEntry} ->
-               Processed = jsonerl:decode(Json),
-
-               octo_cache:store(
-                 CacheKey,
-                 CacheEntry#octo_cache_entry{result = Processed}),
-
-               Processed;
-             Other -> Other
-           end,
-
-  case continue_read_collection(Options, Result) of
-    true  -> Result ++ read_collection(Thing, Args, increase_page(Options));
-    false -> Result
-  end.
-
-options_to_query_params(Options) ->
-  Fragments = options_to_query_params(Options, []),
-  octo_list_helper:join("&", Fragments).
+read_collection(Url, Options, ProcessingFun) ->
+  internal_read_collection(Url, Options, ProcessingFun, []).
 
 %% Internals
 
@@ -81,34 +53,38 @@ status_code_to_tuple_state(StatusCode) ->
     _ -> err
   end.
 
-options_to_query_params([], Query) ->
-  Query;
-options_to_query_params([{ per_page, PerPage }|Rest], Query) ->
-  options_to_query_params(Rest, Query ++ ["per_page=" ++ integer_to_list(PerPage)]);
-options_to_query_params([_|Rest], Query) ->
-  options_to_query_params(Rest, Query).
+internal_read_collection(Url, Options, ProcessingFun, Acc) ->
+  Result = case get(Url, Options) of
+             {ok, cached, CacheKey} ->
+               {ok, Entry} = octo_cache:retrieve({url, CacheKey}),
+               Entry#octo_cache_entry.result;
+             {ok, Json, CacheKey, CacheEntry} ->
+               Processed = ProcessingFun(jsonerl:decode(Json)),
+               Res = {ok, Processed},
 
-continue_read_collection(_, []) -> false;
-continue_read_collection([], _) -> false;
-continue_read_collection([{ all_pages }|_], _) -> true;
-continue_read_collection([_|Rest], Result) ->
-  continue_read_collection(Rest, Result).
+               octo_cache:store(
+                 CacheKey,
+                 CacheEntry#octo_cache_entry{result = Res}),
 
-increase_page([]) -> [];
-increase_page([{ page, Page } | Rest]) -> [{ page, Page + 1 }] ++ Rest;
-increase_page([Head | Rest]) -> [Head | increase_page(Rest)].
+               Res;
+             Other -> Other
+           end,
 
-has_page_option([]) -> false;
-has_page_option([{ page, _}|_]) -> true;
-has_page_option([_|Rest]) -> has_page_option(Rest).
-
-has_all_pages_option([]) -> false;
-has_all_pages_option([{ all_pages }|_]) -> true;
-has_all_pages_option([_|Rest]) -> has_all_pages_option(Rest).
-
-check_pagination_options(Options) ->
-  AddPageOption = (not has_page_option(Options)) and has_all_pages_option(Options),
-  case AddPageOption of
-    true  -> [{ page, 1 } | Options];
-    false -> Options
+  case Result of
+    {ok, PrevResult} ->
+      case proplists:get_value(all_pages, Options) of
+        true ->
+          case octo_pagination_helper:get_url({next, Result}) of
+            {ok, NextUrl} ->
+              internal_read_collection(NextUrl,
+                                       Options,
+                                       ProcessingFun,
+                                       Acc ++ PrevResult);
+            {error, no_such_url} ->
+              {ok, Acc ++ PrevResult}
+          end;
+        undefined    ->
+          {ok, Acc ++ PrevResult}
+      end;
+    Other2 -> Other2
   end.

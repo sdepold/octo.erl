@@ -2,6 +2,44 @@
 -include_lib("eunit/include/eunit.hrl").
 -include("include/octo.hrl").
 
+generate_url_test_() ->
+  Owner = "testuser",
+  Repo = "testrepo",
+  PRNumber = 42,
+  Options = [],
+
+  {inparallel,
+   [?_assertEqual(
+       Url,
+       octo_url_helper:generate_url(Thing, Args, Options))
+    ||
+    {Thing, Args, Url} <-
+    [{pull_request,
+      [Owner, Repo, PRNumber],
+      "https://api.github.com/repos/testuser/testrepo/pulls/42?"},
+
+     {pull_request_commits,
+      [Owner, Repo, PRNumber],
+      "https://api.github.com/repos/testuser/testrepo/pulls/42/commits?"},
+
+     {pull_request_files,
+      [Owner, Repo, PRNumber],
+      "https://api.github.com/repos/testuser/testrepo/pulls/42/files?"}]
+   ]}.
+
+options_to_query_params_test_() ->
+  {inparallel,
+   [?_assertEqual(
+      "",
+      octo_url_helper:options_to_query_params([])),
+    ?_assertEqual(
+      "per_page=100",
+      octo_url_helper:options_to_query_params([{per_page, 100}])),
+    ?_assertEqual(
+      "per_page=100",
+      octo_url_helper:options_to_query_params([{per_page, 100}, hi, {haha, 2}]))
+   ]}.
+
 pull_request_url_test_() ->
   {inparallel,
    [?_assertException(

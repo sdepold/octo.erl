@@ -1,49 +1,44 @@
 -module(octo_pull_request).
 -include("octo.hrl").
 -export([
-  list/3, read/4, list_commits/4, list_files/4, is_merged/4, create/4, update/5, merge/4
+  list/2, list/3,
+  read/4,
+  list_commits/2, list_commits/4,
+  list_files/2, list_files/4,
+  is_merged/4, create/4, update/5, merge/4
 ]).
 
 %% API
 
+list(Arg, Options) when is_tuple(Arg) and is_list(Options) ->
+  octo_pagination_helper:read_collection(Arg,
+                                         Options,
+                                         fun internal_list_prs/1).
 list(Owner, Repo, Options) ->
-  PullRequests = octo_http_helper:read_collection(
-                   pull_request,
-                   [Owner, Repo],
-                   Options),
-  Result = [ ?struct_to_record(octo_pull_request, PullRequest)
-             || (PullRequest) <- PullRequests ],
-  {ok, Result}.
+  Url = octo_url_helper:generate_url(pull_request, [Owner, Repo], Options),
+  octo_http_helper:read_collection(Url, Options, fun internal_list_prs/1).
 
 read(Owner, Repo, Number, Options) ->
   Url = octo_url_helper:pull_request_url(Owner, Repo, Number),
-  Result = case octo_http_helper:get(Url, Options) of
-             {ok, cached, CacheKey} -> octo_cache:retrieve({url, CacheKey});
-             {ok, Json, CacheKey, CacheEntry} ->
-               Processed = ?json_to_record(octo_pull_request, Json),
-               octo_cache:store(
-                 CacheKey,
-                 CacheEntry#octo_cache_entry{result = Processed}),
-               Processed;
-             Other -> Other
-           end,
-  {ok, Result}.
+  internal_read(Url, Options).
 
+list_commits(Arg, Options) ->
+  octo_pagination_helper:read_collection(Arg,
+                                         Options,
+                                         fun internal_list_commits/1).
 list_commits(Owner, Repo, Number, Options) ->
-  Commits = octo_http_helper:read_collection(
-              pull_request_commits,
-              [Owner, Repo, Number],
-              Options),
-  Result = [ ?struct_to_record(octo_commit, Commit) || (Commit) <- Commits ],
-  {ok, Result}.
+  Url = octo_url_helper:generate_url(
+          pull_request_commits, [Owner, Repo, Number], Options),
+  octo_http_helper:read_collection(Url, Options, fun internal_list_commits/1).
 
+list_files(Arg, Options) ->
+  octo_pagination_helper:read_collection(Arg,
+                                         Options,
+                                         fun internal_list_files/1).
 list_files(Owner, Repo, Number, Options) ->
-  Files  = octo_http_helper:read_collection(
-             pull_request_files,
-             [Owner, Repo, Number],
-             Options),
-  Result = [ ?struct_to_record(octo_file, File) || (File) <- Files ],
-  {ok, Result}.
+  Url = octo_url_helper:generate_url(
+          pull_request_files, [Owner, Repo, Number], Options),
+  octo_http_helper:read_collection(Url, Options, fun internal_list_files/1).
 
 is_merged(Owner, Repo, Number, Options) ->
   Url = octo_url_helper:pull_request_merged_url(Owner, Repo, Number),
@@ -69,3 +64,29 @@ update(Owner, Repo, Number, Payload, Options) ->
 merge(Owner, Repo, Number, Options) ->
   Url = octo_url_helper:merge_pull_request_url(Owner, Repo, Number),
   octo_http_helper:put(Url, Options, jsonerl:encode({})).
+
+%% Helper functions
+
+internal_read(Url, Options) ->
+  case octo_http_helper:get(Url, Options) of
+    {ok, cached, CacheKey} ->
+      {ok, Entry} = octo_cache:retrieve({url, CacheKey}),
+      Entry#octo_cache_entry.result;
+    {ok, Json, CacheKey, CacheEntry} ->
+      Processed = ?json_to_record(octo_pull_request, Json),
+      octo_cache:store(
+        CacheKey,
+        CacheEntry#octo_cache_entry{result = Processed}),
+      {ok, Processed};
+    {error, Error} -> {error, Error}
+  end.
+
+internal_list_prs(PullRequests) ->
+  [ ?struct_to_record(octo_pull_request, PullRequest)
+    || (PullRequest) <- PullRequests ].
+
+internal_list_commits(Commits) ->
+  [ ?struct_to_record(octo_commit, Commit) || (Commit) <- Commits ].
+
+internal_list_files(Files) ->
+  [ ?struct_to_record(octo_file, File) || (File) <- Files ].
