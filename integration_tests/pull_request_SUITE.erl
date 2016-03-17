@@ -26,23 +26,22 @@ init_per_suite(_Config) ->
      true -> ok
   end,
 
+  octo:set_credentials(pat, AuthToken),
+
   Repo = "octo.erl-test",
 
-  Opts = [{auth, pat, AuthToken}],
+  Config = [{login, TestingLogin}, {repo, Repo}],
 
   % making sure there's no stale test PRs
   {ok, PRs} = octo:list_pull_requests(
                 TestingLogin,
-                Repo,
-                Opts),
+                Repo),
   case find_test_pull_request_in_list(PRs) of
     null -> ok;
-    ExistingPR -> close_pull_request(ExistingPR, Opts)
+    ExistingPR -> close_pull_request(ExistingPR, Config)
   end,
 
-  [{request_options, Opts},
-   {login, TestingLogin},
-   {repo, Repo}].
+  Config.
 
 end_per_suite(_Config) ->
   application:stop(octo).
@@ -58,8 +57,7 @@ create_and_close(Config) ->
                  {<<"body">>, <<"Don't touch this. Thanks!">>},
                  {<<"head">>, <<"test/head">>},
                  {<<"base">>, <<"test/base">>}
-               },
-               ?config(request_options, Config)),
+               }),
 
   {ok, _Msg} = close_pull_request(PR, Config).
 
@@ -74,5 +72,4 @@ close_pull_request(PullRequest, Config) ->
     ?config(login, Config),
     ?config(repo, Config),
     PullRequest#octo_pull_request.number,
-    {{<<"state">>, <<"closed">>}},
-    ?config(request_options, Config)).
+    {{<<"state">>, <<"closed">>}}).

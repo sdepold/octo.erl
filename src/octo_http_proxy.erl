@@ -8,10 +8,12 @@
          code_change/3, terminate/2]).
 
 -export([request/3, request/4, request/5,
-         get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0]).
+         get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0,
+         set_credentials/2]).
 
 -record(ratelimit, {limit, remaining, reset}).
--record(proxy_state, {ratelimit = #ratelimit{}}).
+-record(proxy_state, {ratelimit = #ratelimit{},
+                      auth_headers = []}).
 
 %% Public functions
 
@@ -31,6 +33,9 @@ get_ratelimit_remaining() ->
 get_ratelimit_reset() ->
   gen_server:call(?MODULE, {get_ratelimit_reset}).
 
+set_credentials(pat, AuthToken) ->
+  gen_server:call(?MODULE, {set_credentials, pat, AuthToken}).
+
 %% Callbacks
 
 start_link() ->
@@ -47,7 +52,7 @@ handle_call(stop, _From, State) ->
 handle_call({request, Method, Url, OctoOpts, Payload, Opts}, _From, State) ->
   CacheKey = proplists:get_value(cache_key, OctoOpts),
 
-  AuthHeaders = octo_auth_helper:parse_options(OctoOpts),
+  AuthHeaders = State#proxy_state.auth_headers,
   CachingHeaders = get_caching_headers(CacheKey),
   Headers = AuthHeaders ++ CachingHeaders,
 
@@ -86,6 +91,11 @@ handle_call({get_ratelimit_remaining}, _From, State) ->
 handle_call({get_ratelimit_reset}, _From, State) ->
   Ratelimit = State#proxy_state.ratelimit,
   {reply, Ratelimit#ratelimit.reset, State};
+handle_call({set_credentials, pat, Token}, _From, State) ->
+  Headers = [{"Authorization",
+              "Basic " ++ base64:encode_to_string(Token ++ ":x-oauth-basic")}],
+  NewState = State#proxy_state{auth_headers = Headers},
+  {reply, ok, NewState};
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 

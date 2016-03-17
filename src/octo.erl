@@ -2,7 +2,8 @@
 
 %% octo: octo library's entry point.
 
--export([get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0]).
+-export([set_credentials/2,
+         get_ratelimit/0, get_ratelimit_remaining/0, get_ratelimit_reset/0]).
 
 -export([
   list_pull_requests/1, list_pull_requests/2, list_pull_requests/3,
@@ -36,6 +37,9 @@
 %% API
 
 %%% General
+
+set_credentials(Type, Data) ->
+  octo_http_proxy:set_credentials(Type, Data).
 
 get_ratelimit() ->
   octo_http_proxy:get_ratelimit().
