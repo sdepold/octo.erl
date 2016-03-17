@@ -29,7 +29,7 @@ init_per_suite(_Config) ->
   Opts = [{auth, pat, AuthToken}],
 
   % making sure there's no stale test PRs
-  {ok, PRs} = octo_pull_request:list(
+  {ok, PRs} = octo:list_pull_requests(
                 TestingLogin,
                 Repo,
                 Opts),
@@ -47,7 +47,7 @@ end_per_suite(_Config) -> ok.
 % Tests
 
 create_and_close(Config) ->
-  {ok, PR} = octo_pull_request:create(
+  {ok, PR} = octo:create_pull_request(
                ?config(login, Config),
                ?config(repo, Config),
                {
@@ -67,7 +67,7 @@ find_test_pull_request_in_list([ PullRequest = #octo_pull_request{ title = <<"Te
 find_test_pull_request_in_list([ _ | Rest ]) -> find_test_pull_request_in_list(Rest).
 
 close_pull_request(PullRequest, Config) ->
-  octo_pull_request:update(
+  octo:update_pull_request(
     ?config(login, Config),
     ?config(repo, Config),
     PullRequest#octo_pull_request.number,
