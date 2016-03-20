@@ -44,31 +44,18 @@ Or in the Erlang shell:
 rr("deps/octo/include/octo.hrl").
 ```
 
-#### octo_pull_request
+### Authentication
 
-To do: Explain octo_pull_request.
-
-#### octo_commit
-
-To do: Explain octo_commit.
-
-#### octo_file
-
-To do: Explain octo_file.
-
-#### octo_reference
-
-To do: Explain octo_reference.
+At te moment, octo.erl only supports authentication using OAuth2 Token (sent in
+a header). To set it, run `octo:set_cretentials(pat, YourToken)`.
 
 ### API
 
-Every of the following commands returns a tuple à la:
+All the following commands return tuples à la:
 
 ```erlang
 {ok, Result}
 ```
-
-The following paragraphs are describing the existing functions.
 
 #### Pull Request
 
@@ -333,42 +320,71 @@ octo:delete_branch(Owner, Repo, BranchName).
 octo:delete_tag(Owner, Repo, TagName).
 ```
 
-### Options
+### Pagination
 
-Every of the mentioned functions can be called with an additional options parameter. It has to be
-a list. The following options are available:
+GitHub API [paginates](https://en.wikipedia.org/wiki/Pagination) its responses
+wherever possible. octo.erl can either fetch all the pages for you in one call
+(effectively hiding pagination from you), or it can let you handle it yourself.
 
-#### Authentication
+To make octo.erl fetch all the pages, read about `all_pages` option below.
 
-Currently it is only possible to authenticate via a *Personal Api token*. You can find further
-information about this topic here: https://github.com/blog/1509-personal-api-tokens
+If you decided to consume pages one by one, here's how you do it:
+
+1. make an ordinary request:
+
+   ```erlang
+   {ok, Page1} = octo:list_whatever(you, want).
+   ```
+
+2. ask octo.erl to fetch the next page of results:
+
+   ```erlang
+   {ok, Page2} = octo:list_whatever({next, Page1}).
+   ```
+
+You can request `prev`, `next`, `first` and `last` pages.
+
+Pagination is supported by all of the "list" functions.
+
+There's a caveat, though. The following code will result in a cache miss,
+costing you a tiny bit of memory for an unused cache entry and also making
+a call to API that would otherwise be avoided.
 
 ```erlang
-Options           = [{ auth, pat, "your_personal_api_token" }].
-{ok, PullRequest} = octo:read_pull_request(Owner, Repo, Number, Options).
+{ok, Page1} = octo:list_whatever("user", "repo"),
+{ok, Page2} = octo:list_whatever({next, Page2}),
+{ok, Page1Again} = octo:list_whatever({prev, Page2}).
 ```
 
-#### Pagination
+This only affects the first page of the results. For details, see [this
+comment](https://github.com/sdepold/octo.erl/issues/25#issuecomment-198951078)
+in our issue tracker.
 
-Every function that returns a list is paginated. By default that are a 30 entries per page.
-You can configure the pagination like this:
+### Options
+
+All of the aforementioned functions can be called with an additional options
+parameter. It has to be a proplist (a list containing `{key, value}` pairs;
+`{key, true}` is equivalent to `key`). The following options are supported:
+
+#### Number of results per page
+
+By default, GitHub returns 30 results per page. To change that to, say, 100
+results per page, do the following:
 
 ```erlang
-Options            = [{ per_page, 100 }].
+Options            = [{per_page, 100}],
 {ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
 
 #### Reading all entries
 
-If you don't want to do the pagination manually, you can also provide an option that resolves all
-pages automatically:
+If you don't want to do the pagination manually, you can provide an option that
+resolves all pages automatically:
 
 ```erlang
-Options            = [all_pages].
+Options            = [all_pages],
 {ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
-
-(`Options` is a `proplist`, so `[{all_pages, true}]` will work as well.)
 
 ## Implementation state
 
