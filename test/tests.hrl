@@ -4,7 +4,7 @@
 
 -define(HACKNEY_MOCK(Tests),
         {inorder,
-         {setup,
+         {foreach,
           fun() ->
               ok = application:start(octo, transient),
               ok = meck:new(hackney),
