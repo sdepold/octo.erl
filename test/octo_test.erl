@@ -3,6 +3,51 @@
 -include("include/octo.hrl").
 -include("test/tests.hrl").
 
+%% General
+
+set_credentials_test_() ->
+  Token = "hello",
+  % "hello:x-oauth-basic" in base64
+  HeaderValue = "Basic aGVsbG86eC1vYXV0aC1iYXNpYw==",
+  Header = {"Authorization", HeaderValue},
+
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(head, _Url, Headers, <<>>, [with_body]) ->
+                        ?assertEqual(Header, hd(Headers)),
+                        {ok, 404, [], undefined}
+                    end),
+
+
+        octo:set_credentials(pat, Token),
+        octo:is_pull_request_merged("octocat", "Hello-World", 1347),
+
+        ?assert(meck:validate(hackney))
+    end]).
+
+ratelimit_test_() ->
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(head, _Url, [], <<>>, [with_body]) ->
+                        {ok,
+                         404,
+                         [{<<"X-RateLimit-Limit">>,     <<"60">>},
+                          {<<"X-RateLimit-Remaining">>, <<"29">>},
+                          {<<"X-RateLimit-Reset">>,     <<"1458499603">>}],
+                         undefined}
+                    end),
+
+        octo:is_pull_request_merged("octocat", "Hello-World", 1347),
+
+        ?assertEqual(60, octo:get_ratelimit()),
+        ?assertEqual(29, octo:get_ratelimit_remaining()),
+        ?assertEqual(1458499603, octo:get_ratelimit_reset()),
+
+        ?assert(meck:validate(hackney))
+    end]).
+
 %% Pull Requests
 
 list_pull_requests_test_() ->
@@ -44,6 +89,34 @@ read_pull_request_test_() ->
 
         ?assertEqual(Expected, Results),
 
+        ?assert(meck:validate(hackney))
+    end,
+    fun() ->
+        Url = octo_url_helper:pull_request_url("octocat", "Hello-World", 1347),
+        octo_cache:store(Url, #octo_cache_entry{result = {ok, result}}),
+
+        meck:expect(hackney, request,
+                    fun(get, _Url, [], <<>>, [with_body]) ->
+                        {ok, 304, [], <<>>}
+                    end),
+
+        ?assertEqual(
+          {ok, result},
+          octo:read_pull_request("octocat", "Hello-World", 1347)),
+
+        ?assert(meck:validate(hackney))
+    end,
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {error, {closed, <<>>}}
+                    end),
+
+
+        % It'll try to look the result up in the cache and will fail
+        ?assertEqual(
+           {error, {closed, <<>>}},
+           octo:read_pull_request("octocat", "Hello-World", 1347)),
         ?assert(meck:validate(hackney))
     end]).
 
@@ -245,7 +318,7 @@ read_reference_test_() ->
   {ok, ExpectedL} = file:consult(?ASSETS_DIR"reference.hrl"),
 
   ?assertEqual(1, length(ExpectedL)),
-  Expected = hd(ExpectedL),
+  Expected = {ok, hd(ExpectedL)},
 
   ?HACKNEY_MOCK([
     fun() ->
@@ -254,18 +327,23 @@ read_reference_test_() ->
                         {ok, StatusCode, [], PRJson}
                     end),
 
-        {S, Result} = octo:read_reference("octocat",
-                                          "Hello-World",
-                                          "refs/heads/featureA"),
+        Result = octo:read_reference("octocat",
+                                     "Hello-World",
+                                     "refs/heads/featureA"),
 
-        if S =:= ok  -> ?assertEqual(Expected, Result);
-           S =:= err -> ok
+        if StatusCode =:= 200 ->
+             ?assertEqual(Expected, Result);
+           StatusCode =:= 304 ->
+             % It'll try to look the result up in the cache and will fail
+             ?assertEqual({error, not_found}, Result);
+           StatusCode =:= 404 ->
+             ?assertEqual({err, PRJson}, Result)
         end,
 
         ?assert(meck:validate(hackney))
     end
     ||
-    StatusCode <- [200, 404]]).
+    StatusCode <- [200, 304, 404]]).
 
 read_tag_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"tag.json"),
@@ -422,3 +500,48 @@ delete_fns_test_() ->
     {Fun, Name} <- [{delete_reference, "refs/heads/featureA"},
                     {delete_branch, "refs/heads/featureA"},
                     {delete_tag, "refs/tags/v0.0.1"}]]).
+
+pagination_test_() ->
+  ?HACKNEY_MOCK(lists:concat([
+    [fun() ->
+         ?assertEqual(
+            {error, not_found},
+            apply(octo, Fun, [{Atom, nonexistent_result}])),
+
+         ?assert(meck:validate(hackney))
+     end,
+     fun() ->
+         octo_cache:store(url, #octo_cache_entry{result = awesome}),
+
+         ?assertEqual(
+            {error, no_such_url},
+            apply(octo, Fun, [{Atom, awesome}])),
+
+         ?assert(meck:validate(hackney))
+     end,
+     fun() ->
+         Result = {ok, 404, [], <<>>},
+         meck:sequence(hackney, request, 5, [Result, Result]),
+
+         octo_cache:store(url, #octo_cache_entry{
+                                  headers = #octo_cache_headers{
+                                               link = [{next, url},
+                                                       {prev, url},
+                                                       {first, url},
+                                                       {last, url}]},
+                                  result = another}),
+
+         ?assertEqual(
+            {err, <<>>},
+            apply(octo, Fun, [{Atom, another}])),
+         ?assert(meck:validate(hackney))
+     end
+    ]
+    ||
+    Fun <- [list_pull_requests,
+            list_pull_request_commits,
+            list_pull_request_files,
+            list_references,
+            list_branches,
+            list_tags],
+    Atom <- [next, prev, first, last]])).

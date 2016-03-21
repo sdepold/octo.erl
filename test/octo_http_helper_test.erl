@@ -44,6 +44,7 @@ get_test_() ->
     end
     ||
     {Status, Result} <- [{200, {ok, Body, Url, #octo_cache_entry{}}},
+                         {304, {ok, cached, Url}},
                          {404, {err, Body}}]]).
 
 delete_test_() ->
@@ -72,7 +73,7 @@ get_response_status_code_test_() ->
     fun() ->
       meck:expect(hackney, request,
                   fun(head, U, "", <<>>, [with_body]) when U =:= Url ->
-                      {ok, StatusCode, [], undef}
+                      {ok, StatusCode, []}
                   end),
 
       ?assertEqual(
@@ -87,16 +88,64 @@ get_response_status_code_test_() ->
 read_collection_test_() ->
   Options = [],
   Id = fun(X) -> X end,
+  Response = <<"{\"id\": 1}">>,
 
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
+                    fun(get, foo, "", <<>>, [with_body]) ->
+                        {ok, 304, [], undefined}
+                    end),
+
+        octo_cache:store(foo, #octo_cache_entry{result = {ok, whatever}}),
+
+        ?assertEqual(
+           {ok, whatever},
+           octo_http_helper:read_collection(foo, Options, Id)),
+        ?assert(meck:validate(hackney))
+    end] ++ [
+    fun() ->
+        meck:expect(hackney, request,
                     fun(get, url, "", <<>>, [with_body]) ->
-                        {ok, 200, [], <<"{\"id\": 1}">>}
+                        {ok, Code, [], Response}
                     end),
 
         ?assertEqual(
-           {ok, {{<<"id">>, 1}}},
+           Result,
            octo_http_helper:read_collection(url, Options, Id)),
+        ?assert(meck:validate(hackney))
+    end
+    ||
+    {Code, Result} <- [{200, {ok, {{<<"id">>, 1}}}},
+                       {404, {err, Response}}]]).
+
+pagination_test_() ->
+  Id = fun(X) -> X end,
+
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:sequence(hackney, request, 5, [{ok, 200, [], <<"[1,2,3]">>}]),
+
+        ?assertEqual(
+           {ok, [1,2,3]},
+           octo_http_helper:read_collection(url, [all_pages], Id)),
+        ?assert(meck:validate(hackney))
+    end,
+    fun() ->
+        meck:sequence(hackney,
+                      request,
+                      5,
+                      [{ok,
+                        200,
+                        [{<<"Link">>, <<"<whatever>; rel=\"next\"">>}],
+                        <<"[1,2,3]">>},
+                       {ok,
+                        200,
+                        [],
+                        <<"[4,5,6]">>}]),
+
+        ?assertEqual(
+           {ok, [1,2,3,4,5,6]},
+           octo_http_helper:read_collection(url, [all_pages], Id)),
         ?assert(meck:validate(hackney))
     end]).
