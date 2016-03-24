@@ -34,6 +34,13 @@
   delete_tag/3, delete_tag/4
 ]).
 
+-export([
+  list_my_organizations/0, list_my_organizations/1, list_my_organizations/2,
+  list_user_organizations/1, list_user_organizations/2,
+  read_organization/1, read_organization/2,
+  update_organization/2, update_organization/3
+]).
+
 %% API
 
 %%% General
@@ -182,6 +189,39 @@ delete_tag(User, Repo, TagName) ->
   delete_tag(User, Repo, TagName, []).
 delete_tag(User, Repo, TagName, Options) ->
   exec(octo_reference, delete_tag, [User, Repo, TagName, Options]).
+
+%% Organizations
+
+list_my_organizations() ->
+  list_my_organizations([]).
+list_my_organizations(Arg) when is_tuple(Arg) ->
+  list_my_organizations(Arg, []);
+list_my_organizations(Options) when is_list(Options) ->
+  exec(octo_organization, list_my_organizations, [Options]).
+list_my_organizations(Arg, Options) when is_tuple(Arg) and is_list(Options) ->
+  exec(octo_organization, list_my_organizations, [Arg, Options]).
+
+list_user_organizations(Arg) when is_tuple(Arg) ->
+  list_user_organizations(Arg, []);
+list_user_organizations(User) when is_list(User) ->
+  list_user_organizations(User, []).
+list_user_organizations(Arg, Options) when is_tuple(Arg) and is_list(Options) ->
+  exec(octo_organization, list_user_organizations, [Arg, Options]);
+list_user_organizations(User, Options) when is_list(User) and is_list(Options) ->
+  exec(octo_organization, list_user_organizations, [User, Options]).
+
+read_organization(Organization) ->
+  read_organization(Organization, []).
+read_organization(Organization, Options) ->
+  exec(octo_organization, read_organization, [Organization, Options]).
+
+
+update_organization(Organization, Payload) ->
+  update_organization(Organization, Payload, []).
+update_organization(Organization, Payload, Options) ->
+  exec(octo_organization, update_organization, [Organization,
+                                                Payload,
+                                                Options]).
 
 %% Internals
 

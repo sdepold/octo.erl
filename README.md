@@ -320,6 +320,55 @@ octo:delete_branch(Owner, Repo, BranchName).
 octo:delete_tag(Owner, Repo, TagName).
 ```
 
+### Organization
+
+```erlang
+%% List organizations you have some access to (e.g. read something from).
+%%
+%% Args:
+%% - Options: see Options section below.
+%%
+%% Returns: {ok, [#octo_organization{}]}
+octo:list_my_organizations(Options).
+
+%% List organizations user's the member of.
+%%
+%% Args:
+%% - User: Username of the user whose organizations we want to list. Char list.
+%% - Options: see Options section below.
+%%
+%% Returns: {ok, [#octo_organization{}]}
+octo:list_user_organizations(User, Options).
+
+%% Retrieve all the info about an organization.
+%%
+%% Args:
+%% - Organization: The name of the organization to retrieve. Char list.
+%% - Options: see Options section below.
+%%
+%% Returns: {ok, #octo_organization{}}
+octo:read_organization(Organization, Options).
+
+%% Update some of an organization's details.
+%%
+%% Args:
+%% - Organization: The name of the organization to update. Char list.
+%% - Payload: Fields to update. Tuple of tuples.
+%%     Example:
+%%     {
+%%       {<<"billing_email">>, <<"will.not.be.publicized@example.com">>},
+%%       {<<"company">>,       <<"Stealth Mode">>},
+%%       {<<"email">>,         <<"will.be.publicly.listed@example.com">>},
+%%       {<<"location">>,      <<"Best place on Earth">>},
+%%       {<<"name">>,          <<"cool_org">>},
+%%       {<<"description">>,   <<"Coolest org evar">>},
+%%     }
+%% - Options: see Options section below.
+%%
+%% Returns: an updated #octo_organization().
+octo:update_organization(Organization, Payload, Options).
+```
+
 ### Pagination
 
 GitHub API [paginates](https://en.wikipedia.org/wiki/Pagination) its responses
@@ -429,11 +478,11 @@ Options            = [all_pages],
   - [ ] Create an issue
   - [ ] Edit an issue
 - [ ] Misc
-- [ ] Organizations
-  - [ ] List your organizations
-  - [ ] List user organizations
-  - [ ] Get an organization
-  - [ ] Edit an organization
+- [x] Organizations
+  - [x] List your organizations
+  - [x] List user organizations
+  - [x] Get an organization
+  - [x] Edit an organization
 - [x] Pull Requests
   - [x] List pull requests
   - [x] Get a single pull request

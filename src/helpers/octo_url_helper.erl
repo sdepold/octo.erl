@@ -9,6 +9,9 @@
   reference_url/2, reference_url/3,
   branch_url/2, branch_url/3,
   tag_url/2, tag_url/3,
+  my_organizations_url/0,
+  user_organizations_url/1,
+  organization_url/1,
   options_to_query_params/1
 ]).
 
@@ -57,6 +60,15 @@ tag_url(Owner, Repo) ->
 
 tag_url(Owner, Repo, TagName) when is_list(TagName) ->
   tag_url(Owner, Repo) ++ "/" ++ TagName.
+
+my_organizations_url() ->
+  "https://api.github.com/user/orgs".
+
+user_organizations_url(User) ->
+  "https://api.github.com/users/" ++ User ++ "/orgs".
+
+organization_url(Organization) ->
+  "https://api.github.com/orgs/" ++ Organization.
 
 options_to_query_params(Options) ->
   Fragments = options_to_query_params(Options, []),
