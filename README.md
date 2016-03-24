@@ -47,7 +47,7 @@ rr("deps/octo/include/octo.hrl").
 ### Authentication
 
 At te moment, octo.erl only supports authentication using OAuth2 Token (sent in
-a header). To set it, run `octo:set_cretentials(pat, YourToken)`.
+a header). To set it, run `octo:set_credentials(pat, "d34dbeef")`.
 
 ### API
 
