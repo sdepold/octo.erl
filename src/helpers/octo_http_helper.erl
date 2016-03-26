@@ -2,7 +2,8 @@
 -include("octo.hrl").
 -export([
   get/2, delete/2, post/3, patch/3, put/3, get_response_status_code/2,
-  read_collection/3
+  read_collection/3,
+  read_to_record/3
 ]).
 
 get(Url, OctoOptions) ->
@@ -44,6 +45,20 @@ get_response_status_code(Url, OctoOptions) ->
 
 read_collection(Url, Options, ProcessingFun) ->
   internal_read_collection(Url, Options, ProcessingFun, []).
+
+read_to_record(Url, Options, ProcessingFun) ->
+  case octo_http_helper:get(Url, Options) of
+    {ok, cached, CacheKey} ->
+      {ok, Entry} = octo_cache:retrieve({url, CacheKey}),
+      Entry#octo_cache_entry.result;
+    {ok, Json, CacheKey, CacheEntry} ->
+      Result = {ok, ProcessingFun(Json)},
+      octo_cache:store(
+        CacheKey,
+        CacheEntry#octo_cache_entry{result = Result}),
+      Result;
+    {error, Error} -> {error, Error}
+  end.
 
 %% Internals
 

@@ -543,5 +543,95 @@ pagination_test_() ->
             list_pull_request_files,
             list_references,
             list_branches,
-            list_tags],
+            list_tags,
+            list_my_organizations,
+            list_user_organizations],
     Atom <- [next, prev, first, last]])).
+
+%% Organizations
+
+list_my_organizations_test_() ->
+  {ok, PRJson} = file:read_file(?ASSETS_DIR"my_organizations.json"),
+  {ok, ExpectedL} = file:consult(?ASSETS_DIR"my_organizations.hrl"),
+
+  ?assertEqual(1, length(ExpectedL)),
+  Expected = hd(ExpectedL),
+
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {ok, 200, [], PRJson}
+                    end),
+
+        {ok, Results} = octo:list_my_organizations(),
+
+        ?assertEqual(Expected, Results),
+
+        ?assert(meck:validate(hackney))
+    end]).
+
+list_user_organizations_test_() ->
+  {ok, PRJson} = file:read_file(?ASSETS_DIR"user_organizations.json"),
+  {ok, ExpectedL} = file:consult(?ASSETS_DIR"user_organizations.hrl"),
+  User = "noname",
+
+  ?assertEqual(1, length(ExpectedL)),
+  Expected = hd(ExpectedL),
+
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {ok, 200, [], PRJson}
+                    end),
+
+        {ok, Results} = octo:list_user_organizations(User),
+
+        ?assertEqual(Expected, Results),
+
+        ?assert(meck:validate(hackney))
+    end]).
+
+read_organization_test_() ->
+  {ok, PRJson} = file:read_file(?ASSETS_DIR"organization.json"),
+  {ok, ExpectedL} = file:consult(?ASSETS_DIR"organization.hrl"),
+  Organization = "noname",
+
+  ?assertEqual(1, length(ExpectedL)),
+  Expected = hd(ExpectedL),
+
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(get, _Url, "", <<>>, [with_body]) ->
+                        {ok, 200, [], PRJson}
+                    end),
+
+        {ok, Results} = octo:read_organization(Organization),
+
+        ?assertEqual(Expected, Results),
+
+        ?assert(meck:validate(hackney))
+    end]).
+
+update_organization_test_() ->
+  {ok, PRJson} = file:read_file(?ASSETS_DIR"update_organization_response.json"),
+  {ok, ExpectedL} = file:consult(?ASSETS_DIR"update_organization_response.hrl"),
+
+  ?assertEqual(1, length(ExpectedL)),
+  Expected = hd(ExpectedL),
+
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(patch, _Url, "", _Payload, [with_body]) ->
+                        {ok, 200, [], PRJson}
+                    end),
+
+        {ok, Result} = octo:update_organization("github", []),
+
+        ?assertEqual(Expected, Result),
+
+        ?assert(meck:validate(hackney))
+    end]).

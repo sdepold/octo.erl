@@ -68,18 +68,8 @@ merge(Owner, Repo, Number, Options) ->
 %% Helper functions
 
 internal_read(Url, Options) ->
-  case octo_http_helper:get(Url, Options) of
-    {ok, cached, CacheKey} ->
-      {ok, Entry} = octo_cache:retrieve({url, CacheKey}),
-      Entry#octo_cache_entry.result;
-    {ok, Json, CacheKey, CacheEntry} ->
-      Processed = ?json_to_record(octo_pull_request, Json),
-      octo_cache:store(
-        CacheKey,
-        CacheEntry#octo_cache_entry{result = Processed}),
-      {ok, Processed};
-    {error, Error} -> {error, Error}
-  end.
+  octo_http_helper:read_to_record(
+    Url, Options, fun(Json) -> ?json_to_record(octo_pull_request, Json) end).
 
 internal_list_prs(PullRequests) ->
   [ ?struct_to_record(octo_pull_request, PullRequest)
