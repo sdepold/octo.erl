@@ -153,3 +153,24 @@ tag_url_test_() ->
       error, function_clause,
       octo_url_helper:tag_url("Minoru", "dotfiles", 1024))
    ]}.
+
+my_organizations_url_test() ->
+  ?assertEqual(
+     "https://api.github.com/user/orgs",
+     octo_url_helper:my_organizations_url()).
+
+user_organizations_url_test_() ->
+  {inparallel,
+   [?_assertEqual(Expected, octo_url_helper:user_organizations_url(User))
+   ||
+   {User, Expected} <-
+   [{"Minoru", "https://api.github.com/users/Minoru/orgs"},
+    {"sdepold", "https://api.github.com/users/sdepold/orgs"}]]}.
+
+organization_url_test_() ->
+  {inparallel,
+   [?_assertEqual(Expected, octo_url_helper:organization_url(Organization))
+   ||
+   {Organization, Expected} <-
+   [{"codingteam", "https://api.github.com/orgs/codingteam"},
+    {"github", "https://api.github.com/orgs/github"}]]}.
