@@ -233,6 +233,10 @@ update_pull_request_test_() ->
 
 merge_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_merge_response.json"),
+  {ok, ExpectedL} = file:consult(?ASSETS_DIR"pull_request_merge_response.hrl"),
+
+  ?assertEqual(1, length(ExpectedL)),
+  Expected = hd(ExpectedL),
 
   ?HACKNEY_MOCK([
     fun() ->
@@ -243,7 +247,7 @@ merge_pull_request_test_() ->
 
         {ok, Result} = octo:merge_pull_request("octocat", "Hello-World", 1347),
 
-        ?assertEqual(PRJson, Result),
+        ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
     end]).
