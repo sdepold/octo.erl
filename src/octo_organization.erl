@@ -29,8 +29,10 @@ read_organization(Organization, Options) ->
 update_organization(Organization, Payload, Options) ->
   Url = octo_url_helper:generate_url(organization, [Organization], Options),
   PayloadJson  = jsonerl:encode(Payload),
-  {ok, Result} = octo_http_helper:patch(Url, Options, PayloadJson),
-  {ok, ?json_to_record(octo_organization, Result)}.
+  case octo_http_helper:patch(Url, Options, PayloadJson) of
+    {ok, Result} -> {ok, ?json_to_record(octo_organization, Result)};
+    Other -> Other
+  end.
 
 %% Internal functions
 

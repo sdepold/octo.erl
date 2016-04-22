@@ -52,19 +52,25 @@ is_merged(Owner, Repo, Number, Options) ->
 create(Owner, Repo, Payload, Options) ->
   Url          = octo_url_helper:pull_request_url(Owner, Repo),
   PayloadJson  = jsonerl:encode(Payload),
-  {ok, Result} = octo_http_helper:post(Url, Options, PayloadJson),
-  {ok, ?json_to_record(octo_pull_request, Result)}.
+  case octo_http_helper:post(Url, Options, PayloadJson) of
+    {ok, Result} -> {ok, ?json_to_record(octo_pull_request, Result)};
+    Other -> Other
+  end.
 
 update(Owner, Repo, Number, Payload, Options) ->
   Url          = octo_url_helper:pull_request_url(Owner, Repo, Number),
   PayloadJson  = jsonerl:encode(Payload),
-  {ok, Result} = octo_http_helper:patch(Url, Options, PayloadJson),
-  {ok, ?json_to_record(octo_pull_request, Result)}.
+  case octo_http_helper:patch(Url, Options, PayloadJson) of
+    {ok, Result} -> {ok, ?json_to_record(octo_pull_request, Result)};
+    Other -> Other
+  end.
 
 merge(Owner, Repo, Number, Options) ->
   Url = octo_url_helper:merge_pull_request_url(Owner, Repo, Number),
-  {ok, Result} = octo_http_helper:put(Url, Options, jsonerl:encode({})),
-  {ok, ?json_to_record(octo_pull_request_merge, Result)}.
+  case octo_http_helper:put(Url, Options, jsonerl:encode({})) of
+    {ok, Result} -> {ok, ?json_to_record(octo_pull_request_merge, Result)};
+    Other -> Other
+  end.
 
 %% Helper functions
 

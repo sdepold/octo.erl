@@ -5,7 +5,7 @@
 
 ternary_fns_test_() ->
   Url = "http://example.com",
-  Body = "empty!",
+  Body = "{}",
 
   ?HACKNEY_MOCK([
     fun() ->
@@ -16,18 +16,43 @@ ternary_fns_test_() ->
                   end),
 
       ?assertEqual(
-         {StatusTerm, Body},
+         Result,
          apply(octo_http_helper, Method, [Url, [], <<>>])
       ),
       ?assert(meck:validate(hackney))
     end
     ||
     Method <- [post, put, patch],
-    {Status, StatusTerm} <- [{200, ok}, {404, err}]]).
+    {Status, Result} <- [{200, {ok, Body}}, {404, {err, #octo_error{}}}]]).
+
+error_passthrough_test_() ->
+  Result = {error, whatever},
+
+  TwoArgs = [url, []],
+  ThreeArgs = [url, [], <<>>],
+
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(_Method, _Url, _Headers, _Payload, _Opts) ->
+                        Result
+                    end),
+
+        ?assertEqual(
+           Result,
+           apply(octo_http_helper, Method, Args)),
+        ?assert(meck:validate(hackney))
+    end
+    ||
+    {Method, Args} <- [{post, ThreeArgs},
+                       {put, ThreeArgs},
+                       {patch, ThreeArgs},
+                       {delete, TwoArgs},
+                       {get_response_status_code, TwoArgs}]]).
 
 get_test_() ->
   Url = "http://example.com",
-  Body = "empty!",
+  Body = "{}",
 
   ?HACKNEY_MOCK([
     fun() ->
@@ -45,7 +70,7 @@ get_test_() ->
     ||
     {Status, Result} <- [{200, {ok, Body, Url, #octo_cache_entry{}}},
                          {304, {ok, cached, Url}},
-                         {404, {err, Body}}]]).
+                         {404, {err, #octo_error{}}}]]).
 
 delete_test_() ->
   Url = "http://example.com",
@@ -117,7 +142,7 @@ read_collection_test_() ->
     end
     ||
     {Code, Result} <- [{200, {ok, {{<<"id">>, 1}}}},
-                       {404, {err, Response}}]]).
+                       {404, {err, #octo_error{}}}]]).
 
 pagination_test_() ->
   Id = fun(X) -> X end,

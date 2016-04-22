@@ -35,8 +35,7 @@
   commits,
   additions,
   deletions,
-  changed_files,
-  documentation_url
+  changed_files
 }).
 
 -record(octo_pull_request_merge, {

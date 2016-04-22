@@ -41,7 +41,7 @@ cache_headers_test_() ->
       ?assert(meck:validate(hackney))
     end]).
 
-request_error_passthrough_test_() ->
+error_passthrough_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,

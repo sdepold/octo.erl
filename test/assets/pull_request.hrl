@@ -512,6 +512,4 @@
  % deletions
  3,
  % changed_files
- 5,
- % documentation_url
- undefined}.
+ 5}.

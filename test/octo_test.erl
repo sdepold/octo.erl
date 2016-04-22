@@ -184,6 +184,40 @@ is_pull_request_merged_test_() ->
     ||
     {Status, Expected} <- [{204, true}, {404, false}]]).
 
+error_passthrough_test_() ->
+  ?HACKNEY_MOCK([
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(_Method, _Url, "", _Payload, [with_body]) ->
+                        {error, whatever}
+                    end),
+
+        ?assertEqual(
+           {error, whatever},
+           apply(octo, Function, Args)),
+
+        ?assert(meck:validate(hackney))
+    end
+    ||
+    {Function, Args} <- [{create_pull_request, ["octocat",
+                                                "Hello-World",
+                                                []]},
+                         {update_pull_request, ["octocat",
+                                                "Hello-World",
+                                                1347,
+                                                undefined,
+                                                []]},
+                         {merge_pull_request, ["octocat",
+                                               "Hello-World",
+                                               1347]},
+                         {create_reference, ["octocat",
+                                             "Hello-World",
+                                             1347]},
+                         {update_reference, ["octocat",
+                                             "Hello-World",
+                                             "refs/heads/featureA",
+                                             undefined]}]]).
+
 create_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_create_response.json"),
   {ok, ExpectedL} = file:consult(?ASSETS_DIR"pull_request_create_response.hrl"),
@@ -341,7 +375,7 @@ read_reference_test_() ->
              % It'll try to look the result up in the cache and will fail
              ?assertEqual({error, not_found}, Result);
            StatusCode =:= 404 ->
-             ?assertEqual({err, PRJson}, Result)
+             ?assertEqual({err, #octo_error{}}, Result)
         end,
 
         ?assert(meck:validate(hackney))
@@ -524,7 +558,8 @@ pagination_test_() ->
          ?assert(meck:validate(hackney))
      end,
      fun() ->
-         Result = {ok, 404, [], <<>>},
+         Result = {ok, 404, [],
+                   <<"{\"message\":\"uh-oh\", \"documentation_url\":\"http://example.com\"}">>},
          meck:sequence(hackney, request, 5, [Result, Result]),
 
          octo_cache:store(url, #octo_cache_entry{
@@ -536,7 +571,8 @@ pagination_test_() ->
                                   result = another}),
 
          ?assertEqual(
-            {err, <<>>},
+            {err, #octo_error{message = <<"uh-oh">>,
+                              documentation_url = <<"http://example.com">>}},
             apply(octo, Fun, [{Atom, another}])),
          ?assert(meck:validate(hackney))
      end
@@ -636,6 +672,18 @@ update_organization_test_() ->
         {ok, Result} = octo:update_organization("github", []),
 
         ?assertEqual(Expected, Result),
+
+        ?assert(meck:validate(hackney))
+    end,
+    fun() ->
+        meck:expect(hackney, request,
+                    fun(patch, _Url, "", _Payload, [with_body]) ->
+                        {error, whatever}
+                    end),
+
+        ?assertEqual(
+          {error, whatever},
+          octo:update_organization("github", [])),
 
         ?assert(meck:validate(hackney))
     end]).

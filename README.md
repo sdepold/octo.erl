@@ -44,6 +44,11 @@ Or in the Erlang shell:
 rr("deps/octo/include/octo.hrl").
 ```
 
+Any function can return `octo_error` record containing `message` and
+`documentation_url` fields describing the error. Other than that, functions
+return records that are specific to their purpose; for example,
+`update_pull_request` will return `octo_pull_request`.
+
 ### Authentication
 
 At te moment, octo.erl only supports authentication using OAuth2 Token (sent in

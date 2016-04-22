@@ -13,41 +13,60 @@ get(Url, OctoOptions) ->
     {ok, StatusCode, _RespHeaders, Body, CacheKey, CacheEntry} ->
         case status_code_to_tuple_state(StatusCode) of
           ok  -> {ok,  Body, CacheKey, CacheEntry};
-          err -> {err, Body}
+          err -> {err, ?json_to_record(octo_error, Body)}
         end;
     Other -> Other
   end.
 
 delete(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, _Body, _CacheKey, _CacheEntry} =
-    octo_http_proxy:request(delete, Url, OctoOptions),
-  {status_code_to_tuple_state(StatusCode), null}.
+  case octo_http_proxy:request(delete, Url, OctoOptions) of
+    {ok, StatusCode, _RespHeaders, _Body, _CacheKey, _CacheEntry} ->
+      {status_code_to_tuple_state(StatusCode), null};
+    Other -> Other
+  end.
 
 post(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} =
-    octo_http_proxy:request(post, Url, OctoOptions, Payload),
-  {status_code_to_tuple_state(StatusCode), Body}.
+  case octo_http_proxy:request(post, Url, OctoOptions, Payload) of
+    {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} ->
+      case status_code_to_tuple_state(StatusCode) of
+        err -> {err, ?json_to_record(octo_error, Body)};
+        ok  -> {ok,  Body}
+      end;
+    Other -> Other
+  end.
 
 put(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} =
-    octo_http_proxy:request(put, Url, OctoOptions, Payload),
-  {status_code_to_tuple_state(StatusCode), Body}.
+  case octo_http_proxy:request(put, Url, OctoOptions, Payload) of
+    {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} ->
+      case status_code_to_tuple_state(StatusCode) of
+        err -> {err, ?json_to_record(octo_error, Body)};
+        ok  -> {ok,  Body}
+      end;
+    Other -> Other
+  end.
 
 patch(Url, OctoOptions, Payload) ->
-  {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} =
-    octo_http_proxy:request(patch, Url, OctoOptions, Payload),
-  {status_code_to_tuple_state(StatusCode), Body}.
+  case octo_http_proxy:request(patch, Url, OctoOptions, Payload) of
+    {ok, StatusCode, _RespHeaders, Body, _CacheKey, _CacheEntry} ->
+      case status_code_to_tuple_state(StatusCode) of
+        err -> {err, ?json_to_record(octo_error, Body)};
+        ok  -> {ok,  Body}
+      end;
+    Other -> Other
+  end.
 
 get_response_status_code(Url, OctoOptions) ->
-  {ok, StatusCode, _RespHeaders, _Body, _CacheKey, _CacheEntry} =
-    octo_http_proxy:request(head, Url, OctoOptions),
-  {ok, StatusCode}.
+  case octo_http_proxy:request(head, Url, OctoOptions) of
+    {ok, StatusCode, _RespHeaders, _Body, _CacheKey, _CacheEntry} ->
+      {ok, StatusCode};
+    Other -> Other
+  end.
 
 read_collection(Url, Options, ProcessingFun) ->
   internal_read_collection(Url, Options, ProcessingFun, []).
 
 read_to_record(Url, Options, ProcessingFun) ->
-  case octo_http_helper:get(Url, Options) of
+  case get(Url, Options) of
     {ok, cached, CacheKey} ->
       {ok, Entry} = octo_cache:retrieve({url, CacheKey}),
       Entry#octo_cache_entry.result;
@@ -57,7 +76,7 @@ read_to_record(Url, Options, ProcessingFun) ->
         CacheKey,
         CacheEntry#octo_cache_entry{result = Result}),
       Result;
-    {error, Error} -> {error, Error}
+    Other -> Other
   end.
 
 %% Internals
@@ -69,21 +88,9 @@ status_code_to_tuple_state(StatusCode) ->
   end.
 
 internal_read_collection(Url, Options, ProcessingFun, Acc) ->
-  Result = case get(Url, Options) of
-             {ok, cached, CacheKey} ->
-               {ok, Entry} = octo_cache:retrieve({url, CacheKey}),
-               Entry#octo_cache_entry.result;
-             {ok, Json, CacheKey, CacheEntry} ->
-               Processed = ProcessingFun(jsonerl:decode(Json)),
-               Res = {ok, Processed},
-
-               octo_cache:store(
-                 CacheKey,
-                 CacheEntry#octo_cache_entry{result = Res}),
-
-               Res;
-             Other -> Other
-           end,
+  Result = read_to_record(Url,
+                          Options,
+                          fun(Json) -> ProcessingFun(jsonerl:decode(Json)) end),
 
   case Result of
     {ok, PrevResult} ->

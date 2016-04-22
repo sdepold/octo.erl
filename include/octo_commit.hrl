@@ -6,6 +6,5 @@
   commit,
   author,
   committer,
-  parents,
-  documentation_url
+  parents
 }).

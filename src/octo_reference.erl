@@ -50,8 +50,10 @@ read_branch(Owner, Repo, BranchName, Options) ->
 create(Owner, Repo, Payload, Options) ->
   Url          = octo_url_helper:reference_url(Owner, Repo),
   PayloadJson  = jsonerl:encode(Payload),
-  {ok, Result} = octo_http_helper:post(Url, Options, PayloadJson),
-  {ok, ?json_to_record(octo_reference, Result)}.
+  case octo_http_helper:post(Url, Options, PayloadJson) of
+    {ok, Result} -> {ok, ?json_to_record(octo_reference, Result)};
+    Other -> Other
+  end.
 
 create_branch(Owner, Repo, BranchName, Source, Options) ->
   create(Owner, Repo, {
@@ -70,8 +72,10 @@ update(Owner, Repo, "refs/" ++ RefName, Payload, Options) ->
 update(Owner, Repo, RefName, Payload, Options) ->
   Url          = octo_url_helper:reference_url(Owner, Repo, RefName),
   PayloadJson  = jsonerl:encode(Payload),
-  {ok, Result} = octo_http_helper:patch(Url, Options, PayloadJson),
-  {ok, ?json_to_record(octo_reference, Result)}.
+  case octo_http_helper:patch(Url, Options, PayloadJson) of
+    {ok, Result} -> {ok, ?json_to_record(octo_reference, Result)};
+    Other -> Other
+  end.
 
 delete(Owner, Repo, "refs/" ++ RefName, Options) ->
   delete(Owner, Repo, RefName, Options);

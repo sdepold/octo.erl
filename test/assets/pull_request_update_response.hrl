@@ -496,6 +496,4 @@
  % deletions
  undefined,
  % changed_files
- undefined,
- % documentation_url
  undefined}.
