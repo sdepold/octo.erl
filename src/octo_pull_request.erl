@@ -63,7 +63,8 @@ update(Owner, Repo, Number, Payload, Options) ->
 
 merge(Owner, Repo, Number, Options) ->
   Url = octo_url_helper:merge_pull_request_url(Owner, Repo, Number),
-  octo_http_helper:put(Url, Options, jsonerl:encode({})).
+  {ok, Result} = octo_http_helper:put(Url, Options, jsonerl:encode({})),
+  {ok, ?json_to_record(octo_pull_request_merge, Result)}.
 
 %% Helper functions
 

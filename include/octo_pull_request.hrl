@@ -38,3 +38,9 @@
   changed_files,
   documentation_url
 }).
+
+-record(octo_pull_request_merge, {
+  sha,
+  merged,
+  message
+}).
