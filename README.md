@@ -483,9 +483,10 @@ Options            = [all_pages],
   - [ ] Create an issue
   - [ ] Edit an issue
 - [ ] Misc
-- [x] Organizations
+- [ ] Organizations
   - [x] List your organizations
   - [x] List user organizations
+  - [ ] List all organizations
   - [x] Get an organization
   - [x] Edit an organization
 - [x] Pull Requests
