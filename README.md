@@ -443,6 +443,11 @@ Options            = [all_pages],
 ## Implementation state
 
 - [ ] Activity
+  - [ ] Events
+  - [ ] Feeds
+  - [ ] Notifications
+  - [ ] Starring
+  - [ ] Watching
 - [ ] Gists
   - [ ] List gists
   - [ ] Get a single gist
@@ -482,6 +487,8 @@ Options            = [all_pages],
   - [ ] Get a single issue
   - [ ] Create an issue
   - [ ] Edit an issue
+  - [ ] Lock an issue
+  - [ ] Unlock an issue
 - [ ] Misc
 - [ ] Organizations
   - [x] List your organizations
