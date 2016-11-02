@@ -18,4 +18,4 @@ clean:
 distclean: clean
 	rebar delete-deps
 
-.PHONY: all deps app tests clean distclean
+.PHONY: all deps app tests integration-tests clean distclean
