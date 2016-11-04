@@ -63,53 +63,53 @@ list_pull_requests(Arg) ->
   list_pull_requests(Arg, []).
 list_pull_requests(Arg, Options) when is_tuple(Arg) and is_list(Options) ->
   exec(octo_pull_request, list, [Arg, Options]);
-list_pull_requests(User, Repo) when is_list(User) and is_list(Repo) ->
-  list_pull_requests(User, Repo, []).
-list_pull_requests(User, Repo, Options) ->
-  exec(octo_pull_request, list, [User, Repo, Options]).
+list_pull_requests(Owner, Repo) when is_list(Owner) and is_list(Repo) ->
+  list_pull_requests(Owner, Repo, []).
+list_pull_requests(Owner, Repo, Options) ->
+  exec(octo_pull_request, list, [Owner, Repo, Options]).
 
-read_pull_request(User, Repo, Number) ->
-  read_pull_request(User, Repo, Number, []).
-read_pull_request(User, Repo, Number, Options) ->
-  exec(octo_pull_request, read, [User, Repo, Number, Options]).
+read_pull_request(Owner, Repo, Number) ->
+  read_pull_request(Owner, Repo, Number, []).
+read_pull_request(Owner, Repo, Number, Options) ->
+  exec(octo_pull_request, read, [Owner, Repo, Number, Options]).
 
 list_pull_request_commits(Arg) ->
   list_pull_request_commits(Arg, []).
 list_pull_request_commits(Arg, Options) ->
   exec(octo_pull_request, list_commits, [Arg, Options]).
-list_pull_request_commits(User, Repo, Number) ->
-  list_pull_request_commits(User, Repo, Number, []).
-list_pull_request_commits(User, Repo, Number, Options) ->
-  exec(octo_pull_request, list_commits, [User, Repo, Number, Options]).
+list_pull_request_commits(Owner, Repo, Number) ->
+  list_pull_request_commits(Owner, Repo, Number, []).
+list_pull_request_commits(Owner, Repo, Number, Options) ->
+  exec(octo_pull_request, list_commits, [Owner, Repo, Number, Options]).
 
 list_pull_request_files(Arg) ->
   list_pull_request_files(Arg, []).
 list_pull_request_files(Arg, Options) ->
   exec(octo_pull_request, list_files, [Arg, Options]).
-list_pull_request_files(User, Repo, Number) ->
-  list_pull_request_files(User, Repo, Number, []).
-list_pull_request_files(User, Repo, Number, Options) ->
-  exec(octo_pull_request, list_files, [User, Repo, Number, Options]).
+list_pull_request_files(Owner, Repo, Number) ->
+  list_pull_request_files(Owner, Repo, Number, []).
+list_pull_request_files(Owner, Repo, Number, Options) ->
+  exec(octo_pull_request, list_files, [Owner, Repo, Number, Options]).
 
-is_pull_request_merged(User, Repo, Number) ->
-  is_pull_request_merged(User, Repo, Number, []).
-is_pull_request_merged(User, Repo, Number, Options) ->
-  exec(octo_pull_request, is_merged, [User, Repo, Number, Options]).
+is_pull_request_merged(Owner, Repo, Number) ->
+  is_pull_request_merged(Owner, Repo, Number, []).
+is_pull_request_merged(Owner, Repo, Number, Options) ->
+  exec(octo_pull_request, is_merged, [Owner, Repo, Number, Options]).
 
-create_pull_request(User, Repo, Payload) ->
-  create_pull_request(User, Repo, Payload, []).
-create_pull_request(User, Repo, Payload, Options) ->
-  exec(octo_pull_request, create, [User, Repo, Payload, Options]).
+create_pull_request(Owner, Repo, Payload) ->
+  create_pull_request(Owner, Repo, Payload, []).
+create_pull_request(Owner, Repo, Payload, Options) ->
+  exec(octo_pull_request, create, [Owner, Repo, Payload, Options]).
 
-update_pull_request(User, Repo, Number, Payload) ->
-  update_pull_request(User, Repo, Number, Payload, []).
-update_pull_request(User, Repo, Number, Payload, Options) ->
-  exec(octo_pull_request, update, [User, Repo, Number, Payload, Options]).
+update_pull_request(Owner, Repo, Number, Payload) ->
+  update_pull_request(Owner, Repo, Number, Payload, []).
+update_pull_request(Owner, Repo, Number, Payload, Options) ->
+  exec(octo_pull_request, update, [Owner, Repo, Number, Payload, Options]).
 
-merge_pull_request(User, Repo, Number) ->
-  merge_pull_request(User, Repo, Number, []).
-merge_pull_request(User, Repo, Number, Options) ->
-  exec(octo_pull_request, merge, [User, Repo, Number, Options]).
+merge_pull_request(Owner, Repo, Number) ->
+  merge_pull_request(Owner, Repo, Number, []).
+merge_pull_request(Owner, Repo, Number, Options) ->
+  exec(octo_pull_request, merge, [Owner, Repo, Number, Options]).
 
 %%% References
 
@@ -117,78 +117,78 @@ list_references(Arg) ->
   list_references(Arg, []).
 list_references(Arg, Options) when is_tuple(Arg) and is_list(Options) ->
   exec(octo_reference, list, [Arg, Options]);
-list_references(User, Repo) when is_list(User) and is_list(Repo) ->
-  list_references(User, Repo, []).
-list_references(User, Repo, Options) ->
-  exec(octo_reference, list, [User, Repo, Options]).
+list_references(Owner, Repo) when is_list(Owner) and is_list(Repo) ->
+  list_references(Owner, Repo, []).
+list_references(Owner, Repo, Options) ->
+  exec(octo_reference, list, [Owner, Repo, Options]).
 
 list_branches(Arg) ->
   list_branches(Arg, []).
 list_branches(Arg, Options) when is_tuple(Arg) and is_list(Options) ->
   exec(octo_reference, list_branches, [Arg, Options]);
-list_branches(User, Repo) when is_list(User) and is_list(Repo) ->
-  list_branches(User, Repo, []).
-list_branches(User, Repo, Options) ->
-  exec(octo_reference, list_branches, [User, Repo, Options]).
+list_branches(Owner, Repo) when is_list(Owner) and is_list(Repo) ->
+  list_branches(Owner, Repo, []).
+list_branches(Owner, Repo, Options) ->
+  exec(octo_reference, list_branches, [Owner, Repo, Options]).
 
 list_tags(Arg) ->
   list_tags(Arg, []).
 list_tags(Arg, Options) when is_tuple(Arg) and is_list(Options) ->
   exec(octo_reference, list_tags, [Arg, Options]);
-list_tags(User, Repo) when is_list(User) and is_list(Repo) ->
-  list_tags(User, Repo, []).
-list_tags(User, Repo, Options) ->
-  exec(octo_reference, list_tags, [User, Repo, Options]).
+list_tags(Owner, Repo) when is_list(Owner) and is_list(Repo) ->
+  list_tags(Owner, Repo, []).
+list_tags(Owner, Repo, Options) ->
+  exec(octo_reference, list_tags, [Owner, Repo, Options]).
 
-read_reference(User, Repo, RefName) ->
-  read_reference(User, Repo, RefName, []).
-read_reference(User, Repo, RefName, Options) ->
-  exec(octo_reference, read, [User, Repo, RefName, Options]).
+read_reference(Owner, Repo, RefName) ->
+  read_reference(Owner, Repo, RefName, []).
+read_reference(Owner, Repo, RefName, Options) ->
+  exec(octo_reference, read, [Owner, Repo, RefName, Options]).
 
-read_tag(User, Repo, TagName) ->
-  read_tag(User, Repo, TagName, []).
-read_tag(User, Repo, TagName, Options) ->
-  exec(octo_reference, read_tag, [User, Repo, TagName, Options]).
+read_tag(Owner, Repo, TagName) ->
+  read_tag(Owner, Repo, TagName, []).
+read_tag(Owner, Repo, TagName, Options) ->
+  exec(octo_reference, read_tag, [Owner, Repo, TagName, Options]).
 
-read_branch(User, Repo, BranchName) ->
-  read_branch(User, Repo, BranchName, []).
-read_branch(User, Repo, BranchName, Options) ->
-  exec(octo_reference, read_branch, [User, Repo, BranchName, Options]).
+read_branch(Owner, Repo, BranchName) ->
+  read_branch(Owner, Repo, BranchName, []).
+read_branch(Owner, Repo, BranchName, Options) ->
+  exec(octo_reference, read_branch, [Owner, Repo, BranchName, Options]).
 
-create_reference(User, Repo, Payload) ->
-  create_reference(User, Repo, Payload, []).
-create_reference(User, Repo, Payload, Options) ->
-  exec(octo_reference, create, [User, Repo, Payload, Options]).
+create_reference(Owner, Repo, Payload) ->
+  create_reference(Owner, Repo, Payload, []).
+create_reference(Owner, Repo, Payload, Options) ->
+  exec(octo_reference, create, [Owner, Repo, Payload, Options]).
 
-create_branch(User, Repo, BranchName, Source) ->
-  create_branch(User, Repo, BranchName, Source, []).
-create_branch(User, Repo, BranchName, Source, Options) ->
-  exec(octo_reference, create_branch, [User, Repo, BranchName, Source, Options]).
+create_branch(Owner, Repo, BranchName, Source) ->
+  create_branch(Owner, Repo, BranchName, Source, []).
+create_branch(Owner, Repo, BranchName, Source, Options) ->
+  exec(octo_reference, create_branch, [Owner, Repo, BranchName, Source, Options]).
 
-create_tag(User, Repo, TagName, Source) ->
-  create_tag(User, Repo, TagName, Source, []).
-create_tag(User, Repo, TagName, Source, Options) ->
-  exec(octo_reference, create_tag, [User, Repo, TagName, Source, Options]).
+create_tag(Owner, Repo, TagName, Source) ->
+  create_tag(Owner, Repo, TagName, Source, []).
+create_tag(Owner, Repo, TagName, Source, Options) ->
+  exec(octo_reference, create_tag, [Owner, Repo, TagName, Source, Options]).
 
-update_reference(User, Repo, RefName, Payload) ->
-  update_reference(User, Repo, RefName, Payload, []).
-update_reference(User, Repo, RefName, Payload, Options) ->
-  exec(octo_reference, update, [User, Repo, RefName, Payload, Options]).
+update_reference(Owner, Repo, RefName, Payload) ->
+  update_reference(Owner, Repo, RefName, Payload, []).
+update_reference(Owner, Repo, RefName, Payload, Options) ->
+  exec(octo_reference, update, [Owner, Repo, RefName, Payload, Options]).
 
-delete_reference(User, Repo, RefName) ->
-  delete_reference(User, Repo, RefName, []).
-delete_reference(User, Repo, RefName, Options) ->
-  exec(octo_reference, delete, [User, Repo, RefName, Options]).
+delete_reference(Owner, Repo, RefName) ->
+  delete_reference(Owner, Repo, RefName, []).
+delete_reference(Owner, Repo, RefName, Options) ->
+  exec(octo_reference, delete, [Owner, Repo, RefName, Options]).
 
-delete_branch(User, Repo, BranchName) ->
-  delete_branch(User, Repo, BranchName, []).
-delete_branch(User, Repo, BranchName, Options) ->
-  exec(octo_reference, delete_branch, [User, Repo, BranchName, Options]).
+delete_branch(Owner, Repo, BranchName) ->
+  delete_branch(Owner, Repo, BranchName, []).
+delete_branch(Owner, Repo, BranchName, Options) ->
+  exec(octo_reference, delete_branch, [Owner, Repo, BranchName, Options]).
 
-delete_tag(User, Repo, TagName) ->
-  delete_tag(User, Repo, TagName, []).
-delete_tag(User, Repo, TagName, Options) ->
-  exec(octo_reference, delete_tag, [User, Repo, TagName, Options]).
+delete_tag(Owner, Repo, TagName) ->
+  delete_tag(Owner, Repo, TagName, []).
+delete_tag(Owner, Repo, TagName, Options) ->
+  exec(octo_reference, delete_tag, [Owner, Repo, TagName, Options]).
 
 %% Organizations
 
@@ -214,7 +214,6 @@ read_organization(Organization) ->
   read_organization(Organization, []).
 read_organization(Organization, Options) ->
   exec(octo_organization, read_organization, [Organization, Options]).
-
 
 update_organization(Organization, Payload) ->
   update_organization(Organization, Payload, []).
