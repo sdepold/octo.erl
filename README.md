@@ -116,20 +116,12 @@ octo:is_pull_request_merged(Owner, Repo, Number).
 
 %% Creating a pull request in a repository.
 %%
-%% Args:
-%% - Owner:   Owner of the repository. Char list.
-%% - Repo:    Name of the repository. Char list.
-%% - Payload: Meta information about the to be created PR. Tuple of tuples.
-%%     Example:
-%%     {
-%%       {<<"title">>, <<"Pull request title">>},
-%%       {<<"body">>, <<"Pull request description">>},
-%%       {<<"head">>, <<"Head branch">>},
-%%       {<<"base">>, <<"Base branch">>}
-%%     }
+%% Title, Head and Base can be either lists of chars in UTF-8, or binaries.
+%% It's acceptable to mix types (e.g. pass Title as binary and two others as
+%% lists, or vice versa.)
 %%
 %% Returns the just created pull request.
-octo:create_pull_request(Owner, Repo, Payload).
+octo:create_pull_request(Owner, Repo, Title, Head, Base).
 
 %% Update a pull request.
 %%

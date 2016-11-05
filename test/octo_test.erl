@@ -199,24 +199,20 @@ error_passthrough_test_() ->
         ?assert(meck:validate(hackney))
     end
     ||
-    {Function, Args} <- [{create_pull_request, ["octocat",
-                                                "Hello-World",
-                                                []]},
-                         {update_pull_request, ["octocat",
-                                                "Hello-World",
-                                                1347,
-                                                undefined,
-                                                []]},
-                         {merge_pull_request, ["octocat",
-                                               "Hello-World",
-                                               1347]},
-                         {create_reference, ["octocat",
-                                             "Hello-World",
-                                             1347]},
-                         {update_reference, ["octocat",
-                                             "Hello-World",
-                                             "refs/heads/featureA",
-                                             undefined]}]]).
+    {Function, Args} <-
+      [ {create_pull_request, ["octocat", "Hello-World", Title, Head, Base]}
+        ||
+        Title <- ["Test PR", <<"Test PR">>],
+        Head <- ["sdepold:test-pr", <<"sdepold:test-pr">>],
+        Base <- ["master", <<"master">>]]
+      ++
+      [{update_pull_request, ["octocat", "Hello-World", 1347, undefined, []]},
+       {merge_pull_request, ["octocat", "Hello-World", 1347]},
+       {create_reference, ["octocat", "Hello-World", 1347]},
+       {update_reference, ["octocat",
+                           "Hello-World",
+                           "refs/heads/featureA",
+                           undefined]}]]).
 
 create_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_create_response.json"),
@@ -234,12 +230,18 @@ create_pull_request_test_() ->
 
         {ok, Result} = octo:create_pull_request("octocat",
                                                 "Hello-World",
-                                                undefined),
+                                                Title,
+                                                Head,
+                                                Base),
 
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]).
+    end
+    ||
+    Title <- ["Test PR", <<"Test PR">>],
+    Head <- ["sdepold:test-pr", <<"sdepold:test-pr">>],
+    Base <- ["master", <<"master">>]]).
 
 update_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_update_response.json"),

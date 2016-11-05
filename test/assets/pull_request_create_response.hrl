@@ -28,7 +28,7 @@
  % title
  <<"new-feature">>,
  % body
- <<"Please pull these awesome changes">>,
+ <<"">>,
  % created_at
  <<"2011-01-26T19:01:12Z">>,
  % updated_at

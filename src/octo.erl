@@ -13,7 +13,7 @@
   list_pull_request_files/1, list_pull_request_files/2,
   list_pull_request_files/3, list_pull_request_files/4,
   is_pull_request_merged/3, is_pull_request_merged/4,
-  create_pull_request/3, create_pull_request/4,
+  create_pull_request/5, create_pull_request/6,
   update_pull_request/4, update_pull_request/5,
   merge_pull_request/3, merge_pull_request/4
 ]).
@@ -96,10 +96,10 @@ is_pull_request_merged(Owner, Repo, Number) ->
 is_pull_request_merged(Owner, Repo, Number, Options) ->
   exec(octo_pull_request, is_merged, [Owner, Repo, Number, Options]).
 
-create_pull_request(Owner, Repo, Payload) ->
-  create_pull_request(Owner, Repo, Payload, []).
-create_pull_request(Owner, Repo, Payload, Options) ->
-  exec(octo_pull_request, create, [Owner, Repo, Payload, Options]).
+create_pull_request(Owner, Repo, Title, Head, Base) ->
+  create_pull_request(Owner, Repo, Title, Head, Base, []).
+create_pull_request(Owner, Repo, Title, Head, Base, Options) ->
+  exec(octo_pull_request, create, [Owner, Repo, Title, Head, Base, Options]).
 
 update_pull_request(Owner, Repo, Number, Payload) ->
   update_pull_request(Owner, Repo, Number, Payload, []).

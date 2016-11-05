@@ -5,7 +5,7 @@
   read/4,
   list_commits/2, list_commits/4,
   list_files/2, list_files/4,
-  is_merged/4, create/4, update/5, merge/4
+  is_merged/4, create/6, update/5, merge/4
 ]).
 
 %% API
@@ -49,9 +49,19 @@ is_merged(Owner, Repo, Number, Options) ->
   end,
   {ok, Result}.
 
-create(Owner, Repo, Payload, Options) ->
+create(Owner, Repo, Title, Head, Base, Options) ->
   Url          = octo_url_helper:pull_request_url(Owner, Repo),
+
+  TitleBinary  = octo_binary_helper:ensure_binary(Title),
+  HeadBinary   = octo_binary_helper:ensure_binary(Head),
+  BaseBinary   = octo_binary_helper:ensure_binary(Base),
+  Payload      = {
+                   {<<"title">>, TitleBinary},
+                   {<<"head">>,  HeadBinary},
+                   {<<"base">>,  BaseBinary}
+                 },
   PayloadJson  = jsonerl:encode(Payload),
+
   case octo_http_helper:post(Url, Options, PayloadJson) of
     {ok, Result} -> {ok, ?json_to_record(octo_pull_request, Result)};
     Other -> Other
