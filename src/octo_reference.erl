@@ -7,7 +7,7 @@
   read/4,
   read_tag/4,
   read_branch/4,
-  create/4, create_branch/5, create_tag/5,
+  create/5, create_branch/5, create_tag/5,
   update/5,
   delete/4, delete_branch/4, delete_tag/4
 ]).
@@ -47,8 +47,15 @@ read_tag(Owner, Repo, TagName, Options) ->
 read_branch(Owner, Repo, BranchName, Options) ->
   read_reference(branch, Owner, Repo, BranchName, Options).
 
-create(Owner, Repo, Payload, Options) ->
+create(Owner, Repo, Ref, Sha, Options) ->
   Url          = octo_url_helper:reference_url(Owner, Repo),
+
+  RefBinary    = octo_binary_helper:ensure_binary(Ref),
+  ShaBinary    = octo_binary_helper:ensure_binary(Sha),
+  Payload      = {
+                   {<<"ref">>, RefBinary},
+                   {<<"sha">>, ShaBinary}
+                 },
   PayloadJson  = jsonerl:encode(Payload),
   case octo_http_helper:post(Url, Options, PayloadJson) of
     {ok, Result} -> {ok, ?json_to_record(octo_reference, Result)};
@@ -56,16 +63,10 @@ create(Owner, Repo, Payload, Options) ->
   end.
 
 create_branch(Owner, Repo, BranchName, Source, Options) ->
-  create(Owner, Repo, {
-    {<<"ref">>, list_to_binary("refs/heads/" ++ BranchName)},
-    {<<"sha">>, list_to_binary(Source)}
-  }, Options).
+  create(Owner, Repo, "refs/heads/" ++ BranchName, Source , Options).
 
 create_tag(Owner, Repo, TagName, Source, Options) ->
-  create(Owner, Repo, {
-    {<<"ref">>, list_to_binary("refs/tags/" ++ TagName)},
-    {<<"sha">>, list_to_binary(Source)}
-  }, Options).
+  create(Owner, Repo, "refs/tags/" ++ TagName, Source, Options).
 
 update(Owner, Repo, "refs/" ++ RefName, Payload, Options) ->
   update(Owner, Repo, RefName, Payload, Options);

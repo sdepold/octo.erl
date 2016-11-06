@@ -208,7 +208,10 @@ error_passthrough_test_() ->
       ++
       [{update_pull_request, ["octocat", "Hello-World", 1347, []]},
        {merge_pull_request, ["octocat", "Hello-World", 1347]},
-       {create_reference, ["octocat", "Hello-World", 1347]},
+       {create_reference, ["octocat",
+                           "Hello-World",
+                           "refs/heads/master",
+                           "aa218f56b14c9653891f9e74264a383fa43fefbd"]},
        {update_reference, ["octocat",
                            "Hello-World",
                            "refs/heads/featureA",
@@ -443,7 +446,8 @@ create_reference_test_() ->
 
         {ok, Result} = octo:create_reference("octocat",
                                              "Hello-World",
-                                             undefined),
+                                             "refs/heads/featureA",
+                                             "aa218f56b14c9653891f9e74264a383fa43fefbd"),
 
         ?assertEqual(Expected, Result),
 

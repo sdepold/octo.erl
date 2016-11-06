@@ -25,7 +25,7 @@
   read_reference/3, read_reference/4,
   read_tag/3, read_tag/4,
   read_branch/3, read_branch/4,
-  create_reference/3, create_reference/4,
+  create_reference/4, create_reference/5,
   create_branch/4, create_branch/5,
   create_tag/4, create_tag/5,
   update_reference/4, update_reference/5,
@@ -153,10 +153,10 @@ read_branch(Owner, Repo, BranchName) ->
 read_branch(Owner, Repo, BranchName, Options) ->
   exec(octo_reference, read_branch, [Owner, Repo, BranchName, Options]).
 
-create_reference(Owner, Repo, Payload) ->
-  create_reference(Owner, Repo, Payload, []).
-create_reference(Owner, Repo, Payload, Options) ->
-  exec(octo_reference, create, [Owner, Repo, Payload, Options]).
+create_reference(Owner, Repo, Ref, Sha) ->
+  create_reference(Owner, Repo, Ref, Sha, []).
+create_reference(Owner, Repo, Ref, Sha, Options) ->
+  exec(octo_reference, create, [Owner, Repo, Ref, Sha, Options]).
 
 create_branch(Owner, Repo, BranchName, Source) ->
   create_branch(Owner, Repo, BranchName, Source, []).

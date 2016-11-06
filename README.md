@@ -218,15 +218,11 @@ octo:read_tag(Owner, Repo, TagName).
 %% Args:
 %% - Owner:   Owner of the repository. Char list.
 %% - Repo:    Name of the repository. Char list.
-%% - Payload: Meta information about the to be created reference. Tuple of tuples.
-%%     Example:
-%%     {
-%%       {<<"ref">>, <<"refs/heads/featureA">>},
-%%       {<<"sha">>, <<"aa218f56b14c9653891f9e74264a383fa43fefbd">>}
-%%     }
+%% - Ref:     The name of a fully qualified reference. Char list or binary.
+%% - Sha:     The SHA1 value to set this reference to. Char list or binary.
 %%
 %% Returns the just created octo_reference.
-octo:create_reference(Owner, Repo, Payload).
+octo:create_reference(Owner, Repo, Ref, Sha).
 
 %% Creating a branch in a repository.
 %%
