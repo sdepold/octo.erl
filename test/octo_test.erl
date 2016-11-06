@@ -206,7 +206,7 @@ error_passthrough_test_() ->
         Head <- ["sdepold:test-pr", <<"sdepold:test-pr">>],
         Base <- ["master", <<"master">>]]
       ++
-      [{update_pull_request, ["octocat", "Hello-World", 1347, undefined, []]},
+      [{update_pull_request, ["octocat", "Hello-World", 1347, []]},
        {merge_pull_request, ["octocat", "Hello-World", 1347]},
        {create_reference, ["octocat", "Hello-World", 1347]},
        {update_reference, ["octocat",
@@ -260,7 +260,7 @@ update_pull_request_test_() ->
         {ok, Result} = octo:update_pull_request("octocat",
                                                 "Hello-World",
                                                 1347,
-                                                undefined),
+                                                []),
 
         ?assertEqual(Expected, Result),
 

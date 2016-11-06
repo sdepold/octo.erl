@@ -5,7 +5,7 @@
   read/4,
   list_commits/2, list_commits/4,
   list_files/2, list_files/4,
-  is_merged/4, create/6, update/5, merge/4
+  is_merged/4, create/6, update/4, merge/4
 ]).
 
 %% API
@@ -67,10 +67,9 @@ create(Owner, Repo, Title, Head, Base, Options) ->
     Other -> Other
   end.
 
-update(Owner, Repo, Number, Payload, Options) ->
+update(Owner, Repo, Number, Options) ->
   Url          = octo_url_helper:pull_request_url(Owner, Repo, Number),
-  PayloadJson  = jsonerl:encode(Payload),
-  case octo_http_helper:patch(Url, Options, PayloadJson) of
+  case octo_http_helper:patch(Url, Options, {}) of
     {ok, Result} -> {ok, ?json_to_record(octo_pull_request, Result)};
     Other -> Other
   end.

@@ -125,22 +125,12 @@ octo:create_pull_request(Owner, Repo, Title, Head, Base).
 
 %% Update a pull request.
 %%
-%% Args:
-%% - Owner:   Owner of the repository. Char list.
-%% - Repo:    Name of the repository. Char list.
-%% - Number:  The (repo scoped) number of the pull request. Integer.
-%% - Payload: Meta information about the update. Tuple of tuples.
-%%     Example:
-%%     {
-%%       {<<"state">>, <<"closed">>},
-%%       {<<"title">>, <<"Another title">>},
-%%       {<<"body">>, <<"Another body">>}
-%%     }
+%% Currently useless as it doesn't give us a way to actually update anything.
 %%
 %% Returns the updated pull request.
-octo:update_pull_request(Owner, Repo, Number, Payload).
+octo:update_pull_request(Owner, Repo, Number).
 
-%% Update a pull request.
+%% Merge a pull request.
 %%
 %% Args:
 %% - Owner:  Owner of the repository. Char list.
