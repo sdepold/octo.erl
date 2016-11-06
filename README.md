@@ -254,15 +254,10 @@ octo:create_tag(Owner, Repo, TagName, Source).
 %% - RefName: Name of the to be created tag. Char list.
 %%     - Valid examples:   refs/heads/my-branch, heads/my-branch, refs/tags/my-tag, tags/my-tag
 %%     - Invalid examples: my-branch, my-tag
-%% - Payload: Meta information about the to be updated reference. Tuple of tuples.
-%%     Example:
-%%     {
-%%       {<<"sha">>, <<"aa218f56b14c9653891f9e74264a383fa43fefbd">>},
-%%       {<<"force">>, true|false}
-%%     }
+%% - Sha: The SHA1 value to set this reference to. Char list or binary.
 %%
 %% Returns the just updated branch octo_reference.
-octo:update_reference(Owner, Repo, RefName, Payload).
+octo:update_reference(Owner, Repo, RefName, Sha).
 
 %% Delete a specific reference of a repository.
 %%

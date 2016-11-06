@@ -215,7 +215,7 @@ error_passthrough_test_() ->
        {update_reference, ["octocat",
                            "Hello-World",
                            "refs/heads/featureA",
-                           undefined]}]]).
+                           "aa218f56b14c9653891f9e74264a383fa43fefbd"]}]]).
 
 create_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_create_response.json"),
@@ -519,7 +519,7 @@ update_reference_test_() ->
         {ok, Result} = octo:update_reference("octocat",
                                              "Hello-World",
                                              "refs/heads/featureA",
-                                             undefined),
+                                             "aa218f56b14c9653891f9e74264a383fa43fefbd"),
 
         ?assertEqual(Expected, Result),
 

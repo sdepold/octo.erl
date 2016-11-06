@@ -68,10 +68,14 @@ create_branch(Owner, Repo, BranchName, Source, Options) ->
 create_tag(Owner, Repo, TagName, Source, Options) ->
   create(Owner, Repo, "refs/tags/" ++ TagName, Source, Options).
 
-update(Owner, Repo, "refs/" ++ RefName, Payload, Options) ->
-  update(Owner, Repo, RefName, Payload, Options);
-update(Owner, Repo, RefName, Payload, Options) ->
+update(Owner, Repo, "refs/" ++ RefName, Sha, Options) ->
+  update(Owner, Repo, RefName, Sha, Options);
+update(Owner, Repo, RefName, Sha, Options) ->
   Url          = octo_url_helper:reference_url(Owner, Repo, RefName),
+  ShaBinary    = octo_binary_helper:ensure_binary(Sha),
+  Payload      = {
+                   {<<"sha">>, ShaBinary}
+                 },
   PayloadJson  = jsonerl:encode(Payload),
   case octo_http_helper:patch(Url, Options, PayloadJson) of
     {ok, Result} -> {ok, ?json_to_record(octo_reference, Result)};

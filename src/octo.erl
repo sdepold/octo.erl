@@ -168,10 +168,10 @@ create_tag(Owner, Repo, TagName, Source) ->
 create_tag(Owner, Repo, TagName, Source, Options) ->
   exec(octo_reference, create_tag, [Owner, Repo, TagName, Source, Options]).
 
-update_reference(Owner, Repo, RefName, Payload) ->
-  update_reference(Owner, Repo, RefName, Payload, []).
-update_reference(Owner, Repo, RefName, Payload, Options) ->
-  exec(octo_reference, update, [Owner, Repo, RefName, Payload, Options]).
+update_reference(Owner, Repo, RefName, Sha) ->
+  update_reference(Owner, Repo, RefName, Sha, []).
+update_reference(Owner, Repo, RefName, Sha, Options) ->
+  exec(octo_reference, update, [Owner, Repo, RefName, Sha, Options]).
 
 delete_reference(Owner, Repo, RefName) ->
   delete_reference(Owner, Repo, RefName, []).
