@@ -331,20 +331,12 @@ octo:read_organization(Organization, Options).
 %%
 %% Args:
 %% - Organization: The name of the organization to update. Char list.
-%% - Payload: Fields to update. Tuple of tuples.
-%%     Example:
-%%     {
-%%       {<<"billing_email">>, <<"will.not.be.publicized@example.com">>},
-%%       {<<"company">>,       <<"Stealth Mode">>},
-%%       {<<"email">>,         <<"will.be.publicly.listed@example.com">>},
-%%       {<<"location">>,      <<"Best place on Earth">>},
-%%       {<<"name">>,          <<"cool_org">>},
-%%       {<<"description">>,   <<"Coolest org evar">>},
-%%     }
 %% - Options: see Options section below.
 %%
+%% This function is useless at the moment as it can't update anything.
+%%
 %% Returns: an updated #octo_organization().
-octo:update_organization(Organization, Payload, Options).
+octo:update_organization(Organization, Options).
 ```
 
 ### Pagination

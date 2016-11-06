@@ -38,7 +38,7 @@
   list_my_organizations/0, list_my_organizations/1, list_my_organizations/2,
   list_user_organizations/1, list_user_organizations/2,
   read_organization/1, read_organization/2,
-  update_organization/2, update_organization/3
+  update_organization/2
 ]).
 
 %% API
@@ -213,11 +213,8 @@ read_organization(Organization) ->
 read_organization(Organization, Options) ->
   exec(octo_organization, read_organization, [Organization, Options]).
 
-update_organization(Organization, Payload) ->
-  update_organization(Organization, Payload, []).
-update_organization(Organization, Payload, Options) ->
+update_organization(Organization, Options) ->
   exec(octo_organization, update_organization, [Organization,
-                                                Payload,
                                                 Options]).
 
 %% Internals
