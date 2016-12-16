@@ -78,7 +78,7 @@ options_to_query_params(Options) ->
 
 options_to_query_params([], Query) ->
   Query;
-options_to_query_params([{ per_page, PerPage }|Rest], Query) ->
+options_to_query_params([{ octo_per_page, PerPage }|Rest], Query) ->
   options_to_query_params(Rest, Query ++ ["per_page=" ++ integer_to_list(PerPage)]);
 options_to_query_params([_|Rest], Query) ->
   options_to_query_params(Rest, Query).

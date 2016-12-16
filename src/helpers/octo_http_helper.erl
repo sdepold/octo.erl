@@ -94,7 +94,7 @@ internal_read_collection(Url, Options, ProcessingFun, Acc) ->
 
   case Result of
     {ok, PrevResult} ->
-      case proplists:get_value(all_pages, Options) of
+      case proplists:get_value(octo_all_pages, Options) of
         true ->
           case octo_pagination_helper:get_url({next, Result}) of
             {ok, NextUrl} ->

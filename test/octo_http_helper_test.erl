@@ -153,7 +153,7 @@ pagination_test_() ->
 
         ?assertEqual(
            {ok, [1,2,3]},
-           octo_http_helper:read_collection(url, [all_pages], Id)),
+           octo_http_helper:read_collection(url, [octo_all_pages], Id)),
         ?assert(meck:validate(hackney))
     end,
     fun() ->
@@ -171,6 +171,6 @@ pagination_test_() ->
 
         ?assertEqual(
            {ok, [1,2,3,4,5,6]},
-           octo_http_helper:read_collection(url, [all_pages], Id)),
+           octo_http_helper:read_collection(url, [octo_all_pages], Id)),
         ?assert(meck:validate(hackney))
     end]).

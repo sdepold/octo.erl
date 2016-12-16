@@ -34,10 +34,10 @@ options_to_query_params_test_() ->
       octo_url_helper:options_to_query_params([])),
     ?_assertEqual(
       "per_page=100",
-      octo_url_helper:options_to_query_params([{per_page, 100}])),
+      octo_url_helper:options_to_query_params([{octo_per_page, 100}])),
     ?_assertEqual(
       "per_page=100",
-      octo_url_helper:options_to_query_params([{per_page, 100}, hi, {haha, 2}]))
+      octo_url_helper:options_to_query_params([{octo_per_page, 100}, hi, {haha, 2}]))
    ]}.
 
 pull_request_url_test_() ->

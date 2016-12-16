@@ -345,7 +345,7 @@ GitHub API [paginates](https://en.wikipedia.org/wiki/Pagination) its responses
 wherever possible. octo.erl can either fetch all the pages for you in one call
 (effectively hiding pagination from you), or it can let you handle it yourself.
 
-To make octo.erl fetch all the pages, read about `all_pages` option below.
+To make octo.erl fetch all the pages, read about `octo_all_pages` option below.
 
 If you decided to consume pages one by one, here's how you do it:
 
@@ -391,7 +391,7 @@ By default, GitHub returns 30 results per page. To change that to, say, 100
 results per page, do the following:
 
 ```erlang
-Options            = [{per_page, 100}],
+Options            = [{octo_per_page, 100}],
 {ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
 
@@ -401,7 +401,7 @@ If you don't want to do the pagination manually, you can provide an option that
 resolves all pages automatically:
 
 ```erlang
-Options            = [all_pages],
+Options            = [octo_all_pages],
 {ok, PullRequests} = octo:read_pull_request(Owner, Repo, Number, Options).
 ```
 
