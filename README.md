@@ -125,10 +125,18 @@ octo:create_pull_request(Owner, Repo, Title, Head, Base).
 
 %% Update a pull request.
 %%
-%% Currently useless as it doesn't give us a way to actually update anything.
+%% Args:
+%% - Owner:   Owner of the repository. Char list.
+%% - Repo:    Name of the repository. Char list.
+%% - Number:  The (repo scoped) number of the pull request. Integer.
+%% - Options: Any combination of the following:
+%%     - `{title, "New title"}`
+%%     - `{body, "Working on it!"}`
+%%     - `{state, "closed"}`
+%%     - `{base, "master"}`
 %%
 %% Returns the updated pull request.
-octo:update_pull_request(Owner, Repo, Number).
+octo:update_pull_request(Owner, Repo, Number, Options).
 
 %% Merge a pull request.
 %%

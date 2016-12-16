@@ -68,8 +68,12 @@ create(Owner, Repo, Title, Head, Base, Options) ->
   end.
 
 update(Owner, Repo, Number, Options) ->
-  Url          = octo_url_helper:pull_request_url(Owner, Repo, Number),
-  case octo_http_helper:patch(Url, Options, {}) of
+  Url     = octo_url_helper:pull_request_url(Owner, Repo, Number),
+
+  Payload = octo_options_helper:extract_payload(
+              Options, [title, body, state, base]),
+
+  case octo_http_helper:patch(Url, Options, Payload) of
     {ok, Result} -> {ok, ?json_to_record(octo_pull_request, Result)};
     Other -> Other
   end.

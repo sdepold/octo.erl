@@ -256,19 +256,32 @@ update_pull_request_test_() ->
   ?HACKNEY_MOCK([
     fun() ->
         meck:expect(hackney, request,
-                    fun(patch, _Url, "", _Payload, [with_body]) ->
+                    fun(patch, _Url, "", Payload, [with_body]) ->
+                        ?assertEqual(Payload, ExpectedPayload),
                         {ok, 200, [], PRJson}
                     end),
 
         {ok, Result} = octo:update_pull_request("octocat",
                                                 "Hello-World",
                                                 1347,
-                                                []),
+                                                Options),
 
         ?assertEqual(Expected, Result),
 
         ?assert(meck:validate(hackney))
-    end]).
+    end
+    ||
+    {Options, ExpectedPayload} <- [
+      {[{state, "closed"}, {body, "Resolved by #97."}],
+       {{<<"body">>, <<"Resolved by #97.">>}, {<<"state">>, <<"closed">>}}},
+
+      {[{title, "[WIP] Increase test coverage"}, {body, "Working on it."}],
+       {{<<"title">>, <<"[WIP] Increase test coverage">>},
+        {<<"body">>, <<"Working on it.">>}}},
+
+      {[{base, "2.10"}, {title, "[Against 2.10] WIP"}],
+       {{<<"title">>, <<"[Against 2.10] WIP">>}, {<<"base">>, <<"2.10">>}}}
+    ]]).
 
 merge_pull_request_test_() ->
   {ok, PRJson} = file:read_file(?ASSETS_DIR"pull_request_merge_response.json"),
