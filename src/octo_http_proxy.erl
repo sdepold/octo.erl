@@ -50,7 +50,7 @@ init(_Args) ->
 handle_call(stop, _From, State) ->
   {stop, normal, ok, State};
 handle_call({request, Method, Url, OctoOpts, Payload, Opts}, _From, State) ->
-  CacheKey = proplists:get_value(cache_key, OctoOpts),
+  CacheKey = proplists:get_value(octo_cache_key, OctoOpts),
 
   AuthHeaders = State#proxy_state.auth_headers,
   CachingHeaders = get_caching_headers(CacheKey),

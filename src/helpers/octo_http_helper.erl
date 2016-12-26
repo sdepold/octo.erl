@@ -7,7 +7,7 @@
 ]).
 
 get(Url, OctoOptions) ->
-  Options = [{cache_key, Url} | OctoOptions],
+  Options = [{octo_cache_key, Url} | OctoOptions],
 
   case octo_http_proxy:request(get, Url, Options) of
     {ok, StatusCode, _RespHeaders, Body, CacheKey, CacheEntry} ->
